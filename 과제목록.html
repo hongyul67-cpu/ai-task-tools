@@ -5,63 +5,265 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>실습과제 목록</title>
 <style>
-:root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--paper:#fff;--soft:#eef3ff;--ok:#1f9d57;--warn:#e8730c;}
+:root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--paper:#fff;--soft:#eef3ff;--ok:#1f9d57;--warn:#e8730c;--danger:#d6483b;}
 *{box-sizing:border-box;}
 body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;}
-.wrap{max-width:760px;margin:0 auto;padding:30px 18px 70px;}
-.top{margin-bottom:18px;}
-.top a{font-size:13px;color:var(--sub);text-decoration:none;}
+.wrap{max-width:760px;margin:0 auto;padding:30px 18px 90px;}
+.top{margin-bottom:18px;display:flex;align-items:center;gap:10px;}
+.top a{font-size:13px;color:var(--sub);text-decoration:none;flex:1;}
 .top a:hover{color:var(--brand);}
 h1{font-size:24px;margin:14px 0 6px;letter-spacing:-.4px;}
-p.lead{color:var(--sub);margin:0 0 24px;font-size:14px;}
-.unit{margin-bottom:22px;}
-.unit h2{font-size:14.5px;color:var(--brand-d);margin:0 0 8px;padding-bottom:6px;border-bottom:2px solid var(--soft);}
-.item{display:block;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:8px;text-decoration:none;color:var(--ink);transition:box-shadow .15s,transform .04s;}
-.item:hover{box-shadow:0 3px 10px rgba(40,60,100,.08);}
-.item:active{transform:translateY(1px);}
-.item .name{font-size:14.5px;font-weight:700;letter-spacing:-.2px;}
-.item .tags{margin-top:5px;}
+p.lead{color:var(--sub);margin:0 0 18px;font-size:14px;}
+.editbar{display:flex;gap:8px;margin-bottom:20px;}
+.btn{appearance:none;border:0;border-radius:10px;padding:10px 14px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+.btn-add{background:var(--ok);color:#fff;flex:1;}
+.btn-edit{background:#eef1f6;color:var(--ink);}
+.btn-edit.active{background:var(--brand);color:#fff;}
+.unit{margin-bottom:14px;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+.unit summary{list-style:none;cursor:pointer;padding:13px 16px;font-size:14.5px;font-weight:800;color:var(--brand-d);background:var(--soft);display:flex;align-items:center;gap:8px;user-select:none;}
+.unit summary::-webkit-details-marker{display:none;}
+.unit summary .chev{transition:transform .15s;font-size:11px;color:var(--brand-d);}
+.unit[open] summary .chev{transform:rotate(90deg);}
+.unit summary .cnt{font-size:11.5px;color:var(--sub);font-weight:600;background:#fff;border-radius:20px;padding:1px 8px;}
+.items{padding:8px 10px 10px;}
+.item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-top:6px;background:#fcfdff;}
+.item a{flex:1;text-decoration:none;color:var(--ink);min-width:0;}
+.item .name{font-size:14px;font-weight:700;letter-spacing:-.2px;}
+.item .tags{margin-top:4px;}
 .badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;margin-right:5px;}
 .badge.req{background:#eef3ff;color:#1f53c4;}
 .badge.opt{background:#fff1e6;color:#b3590a;}
+.delbtn{flex:0 0 auto;width:30px;height:30px;border-radius:8px;border:1px solid #f0cfcb;background:#fff;color:var(--danger);cursor:pointer;font-size:13px;}
+.empty{font-size:12.5px;color:#bbb;font-style:italic;padding:14px;text-align:center;}
+/* 추가 모달 */
+.overlay{position:fixed;inset:0;background:rgba(20,25,35,.5);z-index:50;display:none;align-items:flex-end;justify-content:center;}
+.overlay.show{display:flex;}
+.sheet{background:#fff;width:100%;max-width:760px;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px 30px;}
+.sheet-head{display:flex;align-items:center;margin-bottom:14px;}
+.sheet-head h2{margin:0;flex:1;font-size:16.5px;}
+.closex{border:0;background:#eef1f6;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:15px;}
+label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:14px 0 5px;}
+label.fl:first-of-type{margin-top:0;}
+input[type=text],select{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;background:#fcfdff;}
+input[type=text]:focus,select:focus{outline:none;border-color:var(--brand);}
+.seg{display:flex;gap:8px;}
+.seg button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;color:var(--sub);}
+.seg button.sel{border-color:var(--brand);color:var(--brand-d);background:var(--soft);}
+.filein{display:none;}
+.filepick{border:1.5px dashed #b8c4d8;border-radius:10px;background:#f8fafe;color:var(--brand-d);font-weight:700;font-size:13px;padding:11px;cursor:pointer;text-align:center;}
+.filepick.ok{border-color:var(--ok);color:var(--ok);background:#f0fbf4;}
+.hint{font-size:11.5px;color:#aab;margin-top:4px;}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:#1b2330;color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:90%;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 </style>
 </head>
 <body>
 <div class="wrap">
   <div class="top"><a href="index.html">← 도구 모음으로 돌아가기</a></div>
   <h1>📋 실습과제 목록</h1>
-  <p class="lead">과제를 클릭하면 제출도구가 바로 열리며 양식이 자동으로 불러와집니다. 학반·학번·이름을 입력하고 답을 작성한 뒤 제출하세요.</p>
+  <p class="lead">단원을 눌러 펼치고, 과제를 클릭하면 제출도구가 바로 열립니다.</p>
 
-  <div class="unit">
-    <h2>Ⅱ-1. AI와 대화하고 질문 다루기</h2>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-01_SenGPT_접속하기.json"><div class="name">실습Ⅱ-1-01 · SenGPT 접속하고 첫 대화 나누기</div><div class="tags"><span class="badge req">필수</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-02_네가지AI_비교.json"><div class="name">실습Ⅱ-1-02 · 네 가지 AI에게 같은 질문 던지기</div><div class="tags"><span class="badge req">필수</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-03_RCIF_프롬프트업그레이드.json"><div class="name">실습Ⅱ-1-03 · RCIF 공식으로 프롬프트 업그레이드하기</div><div class="tags"><span class="badge req">필수</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-04_실전팁_프롬프트다듬기.json"><div class="name">실습Ⅱ-1-04 · 실전 팁으로 프롬프트 다듬기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-05_할루시네이션체험.json"><div class="name">실습Ⅱ-1-05 · AI의 거짓말, 할루시네이션 체험하기</div><div class="tags"><span class="badge req">필수</span></div></a>
+  <div class="editbar">
+    <button class="btn btn-add" onclick="openAdd()">＋ 과제 추가</button>
+    <button class="btn btn-edit" id="editToggle" onclick="toggleEdit()">🗑 삭제 모드</button>
   </div>
 
-  <div class="unit">
-    <h2>Ⅱ-2. 업무 이메일 작성하기</h2>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-2-01_견적요청이메일.json"><div class="name">실습Ⅱ-2-01 · 견적 요청 이메일 작성하기</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-2-02_이메일교정.json"><div class="name">실습Ⅱ-2-02 · 거친 초안을 정중한 이메일로 교정하기</div><div class="tags"><span class="badge req">필수</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-2-03_이메일구성요소점검.json"><div class="name">실습Ⅱ-2-03 · 이메일 구성 요소 직접 점검하기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-2-04_고객불만메일답장.json"><div class="name">실습Ⅱ-2-04 · 고객 불만 메일에 답장하기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
-  </div>
+  <div id="unitList"></div>
+</div>
 
-  <div class="unit">
-    <h2>Ⅱ-3. 업무 보고서·기획안 작성하기</h2>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-3-01_공업계_안전개선안.json"><div class="name">실습Ⅱ-3-01 · [공업계] 현장 안전사고 예방 개선안 작성</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-3-02_상업계_마케팅기획안.json"><div class="name">실습Ⅱ-3-02 · [상업계] 신규 서비스 마케팅 기획안 작성</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-3-03_메모_회의록정리.json"><div class="name">실습Ⅱ-3-03 · 두서없는 메모를 회의록으로 정리하기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
-  </div>
+<div class="toast" id="toast"></div>
 
-  <div class="unit">
-    <h2>Ⅱ-4. 멀티턴 대화로 기획서 완성하기</h2>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-4-01_공업계_공정개선기획안.json"><div class="name">실습Ⅱ-4-01 · [공업계] 공정 개선 기획안 완성하기</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-4-02_상업계_고객관리기획안.json"><div class="name">실습Ⅱ-4-02 · [상업계] 고객 관리 자동화 기획안 완성하기</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
-    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-4-03_기획안_AI비판받기.json"><div class="name">실습Ⅱ-4-03 · 내 기획안, AI에게 비판받기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
+<!-- 추가 모달 -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)closeAdd()">
+  <div class="sheet">
+    <div class="sheet-head"><h2>과제 추가</h2><button class="closex" onclick="closeAdd()">✕</button></div>
+
+    <label class="fl">단원</label>
+    <input type="text" id="f_unit" placeholder="예: Ⅱ-1. AI와 대화하고 질문 다루기" list="unitOptions">
+    <datalist id="unitOptions"></datalist>
+
+    <label class="fl">과제 제목</label>
+    <input type="text" id="f_title" placeholder="예: 실습Ⅱ-1-06 · 새 실습 과제">
+
+    <label class="fl">구분</label>
+    <div class="seg">
+      <button type="button" id="tag_req" class="sel" onclick="pickTag('req')">필수</button>
+      <button type="button" id="tag_opt" onclick="pickTag('opt')">선택·심화</button>
+    </div>
+
+    <label class="fl">양식 등록 방법</label>
+    <div class="seg">
+      <button type="button" id="src_url" class="sel" onclick="pickSource('url')">저장소 경로 입력</button>
+      <button type="button" id="src_file" onclick="pickSource('file')">양식 파일(.json) 업로드</button>
+    </div>
+
+    <div id="srcUrlBox" style="margin-top:10px;">
+      <input type="text" id="f_path" placeholder="예: assignments/실습Ⅱ-1-06_새과제.json">
+      <div class="hint">assignments 폴더에 이미 올려둔 .json 파일의 경로를 입력하세요.</div>
+    </div>
+    <div id="srcFileBox" style="margin-top:10px;display:none;">
+      <button type="button" class="filepick" id="filePickBtn" onclick="document.getElementById('f_file').click()">📂 양식 파일(.json) 선택</button>
+      <input type="file" id="f_file" class="filein" accept=".json,application/json" onchange="onPickFile(event)">
+      <div class="hint">이 기기의 브라우저에만 저장됩니다. 다른 기기·브라우저에서는 보이지 않습니다.</div>
+    </div>
+
+    <button class="btn btn-add" style="margin-top:18px;" onclick="saveItem()">저장</button>
   </div>
 </div>
+
+<script>
+const STORE_KEY='taskList_v1';
+let editMode=false;
+let pickedTag='req', pickedSource='url', pickedFileContent=null, pickedFileName=null;
+
+const DEFAULTS=[
+  {unit:"Ⅱ-1. AI와 대화하고 질문 다루기",title:"실습Ⅱ-1-01 · SenGPT 접속하고 첫 대화 나누기",tag:"req",file:"assignments/실습Ⅱ-1-01_SenGPT_접속하기.json"},
+  {unit:"Ⅱ-1. AI와 대화하고 질문 다루기",title:"실습Ⅱ-1-02 · 네 가지 AI에게 같은 질문 던지기",tag:"req",file:"assignments/실습Ⅱ-1-02_네가지AI_비교.json"},
+  {unit:"Ⅱ-1. AI와 대화하고 질문 다루기",title:"실습Ⅱ-1-03 · RCIF 공식으로 프롬프트 업그레이드하기",tag:"req",file:"assignments/실습Ⅱ-1-03_RCIF_프롬프트업그레이드.json"},
+  {unit:"Ⅱ-1. AI와 대화하고 질문 다루기",title:"실습Ⅱ-1-04 · 실전 팁으로 프롬프트 다듬기",tag:"opt",file:"assignments/실습Ⅱ-1-04_실전팁_프롬프트다듬기.json"},
+  {unit:"Ⅱ-1. AI와 대화하고 질문 다루기",title:"실습Ⅱ-1-05 · AI의 거짓말, 할루시네이션 체험하기",tag:"req",file:"assignments/실습Ⅱ-1-05_할루시네이션체험.json"},
+  {unit:"Ⅱ-2. 업무 이메일 작성하기",title:"실습Ⅱ-2-01 · 견적 요청 이메일 작성하기",tag:"req",file:"assignments/실습Ⅱ-2-01_견적요청이메일.json"},
+  {unit:"Ⅱ-2. 업무 이메일 작성하기",title:"실습Ⅱ-2-02 · 거친 초안을 정중한 이메일로 교정하기",tag:"req",file:"assignments/실습Ⅱ-2-02_이메일교정.json"},
+  {unit:"Ⅱ-2. 업무 이메일 작성하기",title:"실습Ⅱ-2-03 · 이메일 구성 요소 직접 점검하기",tag:"opt",file:"assignments/실습Ⅱ-2-03_이메일구성요소점검.json"},
+  {unit:"Ⅱ-2. 업무 이메일 작성하기",title:"실습Ⅱ-2-04 · 고객 불만 메일에 답장하기",tag:"opt",file:"assignments/실습Ⅱ-2-04_고객불만메일답장.json"},
+  {unit:"Ⅱ-3. 업무 보고서·기획안 작성하기",title:"실습Ⅱ-3-01 · [공업계] 현장 안전사고 예방 개선안 작성",tag:"req",file:"assignments/실습Ⅱ-3-01_공업계_안전개선안.json"},
+  {unit:"Ⅱ-3. 업무 보고서·기획안 작성하기",title:"실습Ⅱ-3-02 · [상업계] 신규 서비스 마케팅 기획안 작성",tag:"req",file:"assignments/실습Ⅱ-3-02_상업계_마케팅기획안.json"},
+  {unit:"Ⅱ-3. 업무 보고서·기획안 작성하기",title:"실습Ⅱ-3-03 · 두서없는 메모를 회의록으로 정리하기",tag:"opt",file:"assignments/실습Ⅱ-3-03_메모_회의록정리.json"},
+  {unit:"Ⅱ-4. 멀티턴 대화로 기획서 완성하기",title:"실습Ⅱ-4-01 · [공업계] 공정 개선 기획안 완성하기",tag:"req",file:"assignments/실습Ⅱ-4-01_공업계_공정개선기획안.json"},
+  {unit:"Ⅱ-4. 멀티턴 대화로 기획서 완성하기",title:"실습Ⅱ-4-02 · [상업계] 고객 관리 자동화 기획안 완성하기",tag:"req",file:"assignments/실습Ⅱ-4-02_상업계_고객관리기획안.json"},
+  {unit:"Ⅱ-4. 멀티턴 대화로 기획서 완성하기",title:"실습Ⅱ-4-03 · 내 기획안, AI에게 비판받기",tag:"opt",file:"assignments/실습Ⅱ-4-03_기획안_AI비판받기.json"}
+].map((d,i)=>({id:'d'+i,...d}));
+
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+
+function loadList(){
+  try{
+    const raw=localStorage.getItem(STORE_KEY);
+    if(!raw){ saveList(DEFAULTS); return DEFAULTS.slice(); }
+    const arr=JSON.parse(raw);
+    if(!Array.isArray(arr)) throw 0;
+    return arr;
+  }catch(e){ return DEFAULTS.slice(); }
+}
+function saveList(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
+
+function toggleEdit(){
+  editMode=!editMode;
+  document.getElementById('editToggle').classList.toggle('active',editMode);
+  document.getElementById('editToggle').textContent = editMode ? '✓ 삭제 모드 끄기' : '🗑 삭제 모드';
+  render();
+}
+
+function render(){
+  const list=loadList();
+  const units=[];
+  list.forEach(it=>{ if(!units.includes(it.unit)) units.push(it.unit); });
+
+  const box=document.getElementById('unitList');
+  if(!list.length){ box.innerHTML='<div class="empty">등록된 과제가 없습니다. "과제 추가"로 등록해보세요.</div>'; return; }
+
+  box.innerHTML = units.map((u,ui)=>{
+    const items=list.filter(it=>it.unit===u);
+    const itemsHtml = items.map(it=>{
+      const href = `AI실습과제_제출도구.html?form=${encodeURIComponent(it.file)}`;
+      const badge = it.tag==='opt' ? '<span class="badge opt">선택·심화</span>' : '<span class="badge req">필수</span>';
+      const del = editMode ? `<button class="delbtn" onclick="delItem('${it.id}')" title="삭제">✕</button>` : '';
+      return `<div class="item">
+        <a href="${href}">
+          <div class="name">${eh(it.title)}</div>
+          <div class="tags">${badge}</div>
+        </a>
+        ${del}
+      </div>`;
+    }).join('');
+    return `<details class="unit" ${ui===0?'open':''}>
+      <summary><span class="chev">▶</span><span style="flex:1;">${eh(u)}</span><span class="cnt">${items.length}개</span></summary>
+      <div class="items">${itemsHtml}</div>
+    </details>`;
+  }).join('');
+}
+
+function delItem(id){
+  if(!confirm('이 과제를 목록에서 삭제할까요? (이 기기에서만 사라지며, 원본 파일은 지워지지 않습니다)')) return;
+  let list=loadList();
+  const removed=list.find(x=>x.id===id);
+  list=list.filter(x=>x.id!==id);
+  saveList(list);
+  if(removed && removed.file && removed.file.startsWith('local:')) localStorage.removeItem('localform_'+removed.file.slice(6));
+  render();
+  toast('삭제했습니다.');
+}
+
+/* ── 추가 모달 ── */
+function openAdd(){
+  document.getElementById('f_unit').value='';
+  document.getElementById('f_title').value='';
+  document.getElementById('f_path').value='';
+  pickedFileContent=null; pickedFileName=null;
+  document.getElementById('filePickBtn').textContent='📂 양식 파일(.json) 선택';
+  document.getElementById('filePickBtn').classList.remove('ok');
+  pickTag('req'); pickSource('url');
+  const units=[...new Set(loadList().map(x=>x.unit))];
+  document.getElementById('unitOptions').innerHTML = units.map(u=>`<option value="${ea(u)}"></option>`).join('');
+  document.getElementById('overlay').classList.add('show');
+}
+function closeAdd(){ document.getElementById('overlay').classList.remove('show'); }
+function pickTag(t){
+  pickedTag=t;
+  document.getElementById('tag_req').classList.toggle('sel',t==='req');
+  document.getElementById('tag_opt').classList.toggle('sel',t==='opt');
+}
+function pickSource(s){
+  pickedSource=s;
+  document.getElementById('src_url').classList.toggle('sel',s==='url');
+  document.getElementById('src_file').classList.toggle('sel',s==='file');
+  document.getElementById('srcUrlBox').style.display = s==='url' ? '' : 'none';
+  document.getElementById('srcFileBox').style.display = s==='file' ? '' : 'none';
+}
+function onPickFile(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const j=JSON.parse(r.result);
+      if(!j.tasks||!Array.isArray(j.tasks)) throw 0;
+      pickedFileContent=r.result; pickedFileName=f.name;
+      document.getElementById('filePickBtn').textContent='✅ '+f.name;
+      document.getElementById('filePickBtn').classList.add('ok');
+    }catch(e){ toast('올바른 과제 양식(.json) 파일이 아닙니다.'); }
+  };
+  r.readAsText(f); ev.target.value="";
+}
+function saveItem(){
+  const unit=document.getElementById('f_unit').value.trim();
+  const title=document.getElementById('f_title').value.trim();
+  if(!unit){ toast('단원을 입력하세요.'); return; }
+  if(!title){ toast('과제 제목을 입력하세요.'); return; }
+
+  let file;
+  if(pickedSource==='url'){
+    const path=document.getElementById('f_path').value.trim();
+    if(!path){ toast('양식 파일 경로를 입력하세요.'); return; }
+    file=path;
+  }else{
+    if(!pickedFileContent){ toast('양식 파일을 선택하세요.'); return; }
+    const key=Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+    localStorage.setItem('localform_'+key, pickedFileContent);
+    file='local:'+key;
+  }
+
+  const list=loadList();
+  list.push({id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), unit, title, tag:pickedTag, file});
+  saveList(list);
+  closeAdd();
+  render();
+  toast('과제를 추가했습니다.');
+}
+
+function eh(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function ea(s){return String(s==null?'':s).replace(/"/g,'&quot;');}
+
+render();
+</script>
 </body>
 </html>
