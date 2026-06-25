@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AI 실습과제 - 작성 및 제출</title>
+<title>실습과제 - 작성 및 제출</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
@@ -101,7 +101,7 @@ label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:
 <div class="wrap">
 <div class="topbar">
   <div class="dot">AI</div>
-  <h1 id="barTitle">AI 실습과제</h1>
+  <h1 id="barTitle">실습과제</h1>
   <span id="saveBadge" class="savebadge hidden">저장됨</span>
   <button id="resetBtn" class="btn btn-ghost small hidden" onclick="confirmReset()">처음으로</button>
 </div>
@@ -243,7 +243,7 @@ function checkAutosave(){
     document.getElementById('formScreen').classList.remove('hidden');
     document.getElementById('actionbar').classList.remove('hidden');
     document.getElementById('resetBtn').classList.remove('hidden');
-    document.getElementById('barTitle').textContent=FORM.subject||"AI 실습과제";
+    document.getElementById('barTitle').textContent=FORM.subject||"실습과제";
     document.getElementById('restoreBanner').innerHTML=`
       <div class="restore-banner">
         <strong>⚡ 자동저장된 내용이 있습니다</strong> (${ageStr})<br>
@@ -287,7 +287,7 @@ function renderForm(restore,noscroll){
   document.getElementById('formScreen').classList.remove('hidden');
   document.getElementById('actionbar').classList.remove('hidden');
   document.getElementById('resetBtn').classList.remove('hidden');
-  document.getElementById('barTitle').textContent=FORM.subject||"AI 실습과제";
+  document.getElementById('barTitle').textContent=FORM.subject||"실습과제";
   document.getElementById('aTitle').textContent=FORM.assignmentTitle||"실습과제";
   document.getElementById('aMeta').textContent=[FORM.subject,FORM.teacher].filter(Boolean).join("  ·  ");
   const desc=document.getElementById('aDesc');
@@ -493,7 +493,7 @@ function buildPdfHtml(){
   const now=new Date();
   const ds=`${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   let h=`<div class="pdf-block" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:20px 22px;border-bottom:2px solid #2f6df0;">
-    <div style="font-size:12px;color:#2f6df0;font-weight:700;">${eh(FORM.subject||'AI 실습과제')}</div>
+    <div style="font-size:12px;color:#2f6df0;font-weight:700;">${eh(FORM.subject||'실습과제')}</div>
     <div style="font-size:21px;font-weight:800;margin:4px 0 8px;color:#1b2330;">${eh(FORM.assignmentTitle||'실습과제')}</div>
     <div style="font-size:13px;color:#444;">${eh(info)}</div>
     <div style="font-size:12px;color:#888;margin-top:4px;">제출일시: ${ds}${FORM.teacher?'   ·   담당: '+eh(FORM.teacher):''}</div></div>`;

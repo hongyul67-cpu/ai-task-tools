@@ -332,7 +332,7 @@ function buildPdfHtml(){
   const s=DATA.student||{};
   const info=(FORM.studentFields||[]).map(f=>`${f.label}: ${eh(s[f.key]||'-')}`).join('  /  ');
   let h=`<div class="pdf-block" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:20px 22px;border-bottom:2px solid #e8730c;">
-    <div style="font-size:12px;color:#e8730c;font-weight:700;">${eh(FORM.subject||'AI 실습과제')} · 채점 결과</div>
+    <div style="font-size:12px;color:#e8730c;font-weight:700;">${eh(FORM.subject||'실습과제')} · 채점 결과</div>
     <div style="font-size:21px;font-weight:800;margin:4px 0 8px;color:#1b2330;">${eh(FORM.assignmentTitle||'실습과제')}</div>
     <div style="font-size:13px;color:#444;">${eh(info)}</div>
     ${FORM.teacher?`<div style="font-size:12px;color:#888;margin-top:4px;">채점: ${eh(FORM.teacher)}</div>`:''}
