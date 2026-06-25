@@ -1,0 +1,58 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-1-03  RCIF 공식으로 프롬프트 업그레이드하기 〔필수〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "막연한 프롬프트를 RCIF 4요소(역할·맥락·지시·형식)로 구조화하면 결과가 어떻게 달라지는지 직접 비교 체험합니다.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. 막연한 프롬프트 결과 화면",
+      "guide": "'이력서 써 줘'처럼 막연한 프롬프트를 입력한 결과 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. 나의 RCIF 프롬프트 설계",
+      "guide": "아래 4요소를 직접 채워 완성된 프롬프트를 적으세요.\n· 역할(R):\n· 맥락(C):\n· 지시(I):\n· 형식(F):\n\n▶ 완성 프롬프트:",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. RCIF 프롬프트 결과 화면",
+      "guide": "완성된 RCIF 프롬프트를 입력한 결과 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. 두 결과 비교 분석",
+      "guide": "아래 항목별로 두 결과를 비교해 적으세요.\n· 구체성(막연 vs RCIF):\n· 바로 쓸 수 있는 정도:\n· 내 상황 반영 여부:\n· 가장 크게 달라진 점:",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

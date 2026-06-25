@@ -1,0 +1,58 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-1-01  SenGPT 접속하고 첫 대화 나누기 〔필수〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "SenGPT에 처음 접속하여 기본 대화를 나누고, AI가 어떻게 응답하는지 직접 체험합니다. 각 단계를 진행하며 화면을 캡처해 제출하세요.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. 로그인 및 SenGPT 접속 화면",
+      "guide": "SEN에듀 로그인 화면 또는 SenGPT 채팅 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. AI와 나눈 첫 번째 대화 화면",
+      "guide": "AI에게 질문하고 받은 답변 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. 이어서 한 꼬리 질문과 AI 답변 화면",
+      "guide": "첫 답변에서 궁금한 부분을 골라 다시 질문한 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. 실습 후 느낀 점",
+      "guide": "SenGPT를 처음 써보며 느낀 점, 신기했거나 예상과 달랐던 점을 자유롭게 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

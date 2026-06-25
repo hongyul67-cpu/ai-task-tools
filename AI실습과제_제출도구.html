@@ -208,12 +208,26 @@ function loadForm(ev){
   r.onload=()=>{
     try{
       const j=JSON.parse(r.result);
-      if(!j.tasks||!Array.isArray(j.tasks)) throw 0;
-      FORM=j; DATA={student:{},answers:{}};
-      checkAutosave();
+      applyForm(j);
     }catch(e){toast("양식 파일을 읽을 수 없습니다.");}
   };
   r.readAsText(f); ev.target.value="";
+}
+
+function applyForm(j){
+  if(!j.tasks||!Array.isArray(j.tasks)) throw 0;
+  FORM=j; DATA={student:{},answers:{}};
+  checkAutosave();
+}
+
+/* ── 링크로 양식 자동 불러오기 (예: ?form=assignments/파일명.json) ── */
+function loadFormFromUrl(){
+  const params=new URLSearchParams(location.search);
+  const path=params.get('form');
+  if(!path) return;
+  fetch(path).then(r=>{if(!r.ok) throw 0; return r.json();})
+    .then(j=>applyForm(j))
+    .catch(()=>toast("과제 양식을 불러올 수 없습니다. 선생님께 문의하세요."));
 }
 
 function checkAutosave(){
@@ -521,6 +535,8 @@ function pad(n){return String(n).padStart(2,'0');}
 function eh(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function ea(s){return String(s==null?'':s).replace(/"/g,'&quot;');}
 function confirmReset(){if(confirm("처음 화면으로 돌아갈까요? 자동저장 내용은 유지됩니다.")){if(autoSaveTimer)clearInterval(autoSaveTimer);FORM=null;DATA={student:{},answers:{}};['formScreen','actionbar'].forEach(id=>document.getElementById(id).classList.add('hidden'));['startScreen'].forEach(id=>document.getElementById(id).classList.remove('hidden'));document.getElementById('resetBtn').classList.add('hidden');document.getElementById('restoreBanner').innerHTML="";window.scrollTo(0,0);}}
+
+loadFormFromUrl();
 </script>
 </body>
 </html>

@@ -1,0 +1,58 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-3-03  두서없는 메모를 회의록으로 정리하기 〔선택·심화〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "두서없는 회의 메모를 AI를 활용해 정식 회의록 형식으로 정리하고, AI가 없는 내용을 지어내지 않았는지 원본과 대조합니다.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. 원본 회의 메모",
+      "guide": "정리할 회의 메모를 그대로 적거나 캡처해 넣으세요. (학습자료의 예시 메모를 사용해도 됩니다)",
+      "allowText": true,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. AI에게 입력한 프롬프트",
+      "guide": "회의록 정리를 요청할 때 입력한 프롬프트를 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. AI가 정리한 회의록",
+      "guide": "AI가 만들어 준 회의록을 붙여넣거나 캡처해 넣으세요.",
+      "allowText": true,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. 원본 메모와 AI 회의록 대조 결과",
+      "guide": "원본 메모에 없는 내용이 AI 회의록에 추가됐는지 확인하세요.\n· 원본에 없는 내용이 추가됐는가? (있다면 어떤 내용?):\n· 원본 내용이 잘못 정리된 부분이 있는가?:\n· AI 회의록에서 수정한 부분:",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

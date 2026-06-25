@@ -1,0 +1,74 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-1-02  네 가지 AI에게 같은 질문 던지기 〔필수〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "SenGPT, ChatGPT, Gemini에 동일한 질문을 입력하고 각 AI의 답변 스타일과 내용을 비교·분석합니다.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. 내가 입력한 공통 질문",
+      "guide": "세 AI에 공통으로 입력한 질문을 그대로 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. SenGPT 답변 화면",
+      "guide": "SenGPT의 답변 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. ChatGPT 답변 화면",
+      "guide": "ChatGPT의 답변 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. Gemini 답변 화면",
+      "guide": "Gemini의 답변 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q5",
+      "title": "5. AI 비교 분석",
+      "guide": "아래 항목별로 세 AI를 비교해 적으세요.\n· 답변 길이 비교:\n· 이해하기 쉬운 정도:\n· 한국어 자연스러움:\n· 가장 인상적인 AI와 이유:",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q6",
+      "title": "6. 상황별로 어떤 AI를 쓰면 좋을지 나의 생각",
+      "guide": "세 AI를 써본 후, 어떤 상황에서 어떤 AI를 쓰면 좋을지 나의 생각을 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

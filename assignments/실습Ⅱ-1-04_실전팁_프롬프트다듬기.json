@@ -1,0 +1,66 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-1-04  실전 팁으로 프롬프트 다듬기 〔선택·심화〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "단계 나누기→다시 시키기→조건 명시+검증 요청 팁을 차례로 적용하며 결과물이 발전하는 과정을 체험합니다.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. 선택한 계열과 주제",
+      "guide": "공업계(전기 안전 기초) 또는 상업계(고객 응대 기본 매너) 중 하나를 선택하고, 내가 설정한 주제를 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. 1단계: 목차 요청 결과",
+      "guide": "AI에게 슬라이드 목차만 요청한 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. 2단계: 한 슬라이드 내용 상세화 결과",
+      "guide": "목차 중 한 슬라이드를 골라 더 자세히 써달라 요청한 결과를 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. 3단계: 조건 명시+검증 요청 최종 결과",
+      "guide": "분량·말투를 지정하고 AI에게 자가점검을 요청한 최종 결과를 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q5",
+      "title": "5. 처음 답변과 최종 답변 비교 소감",
+      "guide": "3단계를 거치며 결과물이 어떻게 달라졌는지 느낀 점을 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

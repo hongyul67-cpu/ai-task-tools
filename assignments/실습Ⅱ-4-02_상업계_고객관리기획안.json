@@ -1,0 +1,58 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-4-02  [상업계] 고객 관리 자동화 기획안 완성하기 〔필수·계열택1〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "고객 생일 할인 알림 자동화 문제를 멀티턴(Multi-turn) 대화로 해결하고, 앱 개발 기획서를 완성합니다. 이 기획서는 다음 단원(Ⅲ. 바이브 코딩)에서 직접 사용합니다.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. [1턴] 문제 제시와 AI 답변 화면",
+      "guide": "고객 생일 알림 문제를 제시하고 AI로부터 해결 방법을 받은 화면을 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. [2턴] 기능과 화면 구성 요청 결과",
+      "guide": "앱의 주요 기능과 화면 구성 설명을 요청한 결과를 캡처해 넣으세요.",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. [3턴] AI가 작성한 앱 개발 기획서",
+      "guide": "기획서 작성을 요청해 받은 결과를 붙여넣거나 캡처해 넣으세요.",
+      "allowText": true,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. 멀티턴 대화를 이어가며 느낀 점",
+      "guide": "여러 번 주고받은 대화를 통해 결과물이 어떻게 구체화됐는지, 느낀 점을 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

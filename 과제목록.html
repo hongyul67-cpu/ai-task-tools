@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>실습과제 목록</title>
+<style>
+:root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--paper:#fff;--soft:#eef3ff;--ok:#1f9d57;--warn:#e8730c;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;}
+.wrap{max-width:760px;margin:0 auto;padding:30px 18px 70px;}
+.top{margin-bottom:18px;}
+.top a{font-size:13px;color:var(--sub);text-decoration:none;}
+.top a:hover{color:var(--brand);}
+h1{font-size:24px;margin:14px 0 6px;letter-spacing:-.4px;}
+p.lead{color:var(--sub);margin:0 0 24px;font-size:14px;}
+.unit{margin-bottom:22px;}
+.unit h2{font-size:14.5px;color:var(--brand-d);margin:0 0 8px;padding-bottom:6px;border-bottom:2px solid var(--soft);}
+.item{display:block;background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:8px;text-decoration:none;color:var(--ink);transition:box-shadow .15s,transform .04s;}
+.item:hover{box-shadow:0 3px 10px rgba(40,60,100,.08);}
+.item:active{transform:translateY(1px);}
+.item .name{font-size:14.5px;font-weight:700;letter-spacing:-.2px;}
+.item .tags{margin-top:5px;}
+.badge{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:20px;margin-right:5px;}
+.badge.req{background:#eef3ff;color:#1f53c4;}
+.badge.opt{background:#fff1e6;color:#b3590a;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="index.html">← 도구 모음으로 돌아가기</a></div>
+  <h1>📋 실습과제 목록</h1>
+  <p class="lead">과제를 클릭하면 제출도구가 바로 열리며 양식이 자동으로 불러와집니다. 학반·학번·이름을 입력하고 답을 작성한 뒤 제출하세요.</p>
+
+  <div class="unit">
+    <h2>Ⅱ-1. AI와 대화하고 질문 다루기</h2>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-01_SenGPT_접속하기.json"><div class="name">실습Ⅱ-1-01 · SenGPT 접속하고 첫 대화 나누기</div><div class="tags"><span class="badge req">필수</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-02_네가지AI_비교.json"><div class="name">실습Ⅱ-1-02 · 네 가지 AI에게 같은 질문 던지기</div><div class="tags"><span class="badge req">필수</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-03_RCIF_프롬프트업그레이드.json"><div class="name">실습Ⅱ-1-03 · RCIF 공식으로 프롬프트 업그레이드하기</div><div class="tags"><span class="badge req">필수</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-04_실전팁_프롬프트다듬기.json"><div class="name">실습Ⅱ-1-04 · 실전 팁으로 프롬프트 다듬기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-1-05_할루시네이션체험.json"><div class="name">실습Ⅱ-1-05 · AI의 거짓말, 할루시네이션 체험하기</div><div class="tags"><span class="badge req">필수</span></div></a>
+  </div>
+
+  <div class="unit">
+    <h2>Ⅱ-2. 업무 이메일 작성하기</h2>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-2-01_견적요청이메일.json"><div class="name">실습Ⅱ-2-01 · 견적 요청 이메일 작성하기</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-2-02_이메일교정.json"><div class="name">실습Ⅱ-2-02 · 거친 초안을 정중한 이메일로 교정하기</div><div class="tags"><span class="badge req">필수</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-2-03_이메일구성요소점검.json"><div class="name">실습Ⅱ-2-03 · 이메일 구성 요소 직접 점검하기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-2-04_고객불만메일답장.json"><div class="name">실습Ⅱ-2-04 · 고객 불만 메일에 답장하기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
+  </div>
+
+  <div class="unit">
+    <h2>Ⅱ-3. 업무 보고서·기획안 작성하기</h2>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-3-01_공업계_안전개선안.json"><div class="name">실습Ⅱ-3-01 · [공업계] 현장 안전사고 예방 개선안 작성</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-3-02_상업계_마케팅기획안.json"><div class="name">실습Ⅱ-3-02 · [상업계] 신규 서비스 마케팅 기획안 작성</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-3-03_메모_회의록정리.json"><div class="name">실습Ⅱ-3-03 · 두서없는 메모를 회의록으로 정리하기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
+  </div>
+
+  <div class="unit">
+    <h2>Ⅱ-4. 멀티턴 대화로 기획서 완성하기</h2>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-4-01_공업계_공정개선기획안.json"><div class="name">실습Ⅱ-4-01 · [공업계] 공정 개선 기획안 완성하기</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-4-02_상업계_고객관리기획안.json"><div class="name">실습Ⅱ-4-02 · [상업계] 고객 관리 자동화 기획안 완성하기</div><div class="tags"><span class="badge req">필수·계열택1</span></div></a>
+    <a class="item" href="AI실습과제_제출도구.html?form=assignments/실습Ⅱ-4-03_기획안_AI비판받기.json"><div class="name">실습Ⅱ-4-03 · 내 기획안, AI에게 비판받기</div><div class="tags"><span class="badge opt">선택·심화</span></div></a>
+  </div>
+</div>
+</body>
+</html>

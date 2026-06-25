@@ -1,0 +1,58 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-1-05  AI의 거짓말, 할루시네이션 체험하기 〔필수〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "AI에게 답을 알 수 없는 질문을 던져 그럴듯하게 지어내는 모습을 목격하고, 직접 사실 여부를 검증합니다.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. AI에게 입력한 질문",
+      "guide": "내가 실제 AI에게 입력한 질문을 그대로 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. AI 답변 화면 캡처",
+      "guide": "AI가 답한 화면을 캡처해 넣으세요. (수치·출처·조항 번호 등 그럴듯한 부분이 잘 보이게)",
+      "allowText": false,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. 사실 검증 결과",
+      "guide": "인터넷·공식 사이트에서 실제로 확인한 결과를 적으세요.\n· 실제로 확인되는가? (예/아니오):\n· AI가 그럴듯하게 지어낸 부분:\n· 검증에 활용한 사이트/출처:",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. 느낀 점과 교훈",
+      "guide": "체험 후 'AI 결과물을 그대로 믿으면 안 되는 이유'를 한 문장으로 정리하고, 느낀 점을 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

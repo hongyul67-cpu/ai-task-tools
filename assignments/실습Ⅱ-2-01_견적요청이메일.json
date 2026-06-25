@@ -1,0 +1,66 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-2-01  견적 요청 이메일 작성하기 〔필수·계열택1〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "나의 계열(공업계/상업계)에 맞는 시나리오로 AI와 함께 정중한 견적 요청 이메일을 작성합니다. 완성 후 반드시 내용을 검토하고 수정하세요.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. 선택한 계열과 시나리오",
+      "guide": "공업계(기계 부품 견적 요청) 또는 상업계(원두 견적 및 샘플 요청) 중 하나를 고르고, 간략한 상황을 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. AI에게 입력한 프롬프트",
+      "guide": "실제로 AI에게 입력한 이메일 작성 프롬프트를 그대로 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. AI가 작성한 이메일 초안",
+      "guide": "AI가 만들어 준 이메일을 그대로 붙여넣거나 화면을 캡처해 넣으세요.",
+      "allowText": true,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. 내가 수정한 최종 이메일",
+      "guide": "AI 초안에서 고친 부분(회사명·수량·날짜 등)을 반영한 최종 이메일을 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q5",
+      "title": "5. 어떤 부분을 왜 수정했나?",
+      "guide": "AI 초안에서 수정한 이유를 한두 줄로 적으세요. (예: 날짜가 빠져 있어 추가함)",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

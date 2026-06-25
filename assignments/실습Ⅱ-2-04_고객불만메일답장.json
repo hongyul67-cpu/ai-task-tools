@@ -1,0 +1,66 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-2-04  고객 불만 메일에 답장하기 〔선택·심화〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "고객 항의 메일에 사과와 해결 방안을 담아 정중하게 답장하는 연습입니다. 사과와 변명의 차이를 구분하는 것이 핵심입니다.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. 선택한 시나리오",
+      "guide": "상업계(텀블러 파손 환불 요청) 또는 공업계(납기 3일 지연 항의) 중 하나를 선택하고, 간단히 상황을 정리하세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. 고객 핵심 요구 파악",
+      "guide": "받은 메일에서 파악한 내용을 적으세요.\n· 고객의 핵심 요구:\n· 고객의 감정 상태:\n· 우리가 먼저 인정해야 할 부분:",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. AI에게 입력한 답장 작성 프롬프트",
+      "guide": "AI에게 답장 작성을 요청할 때 입력한 프롬프트를 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. AI가 작성한 답장 이메일",
+      "guide": "AI가 만들어 준 답장을 붙여넣거나 캡처해 넣으세요.",
+      "allowText": true,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q5",
+      "title": "5. 검토 의견",
+      "guide": "AI 답장을 점검해 아래에 답하세요.\n· 사과가 진정성 있게 느껴지는가?\n· 변명으로 들리는 표현이 있는가?\n· 해결 방안이 구체적인가?\n· 수정할 부분이 있다면?",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-2-03  이메일 구성 요소 직접 점검하기 〔선택·심화〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "부족한 이메일을 직접 진단하고 빠진 요소를 채운 뒤, AI에게 추가 보완을 받아 완성도 높은 이메일을 완성합니다.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. 진단 결과 — 빠진 구성 요소",
+      "guide": "점검 대상 이메일('안녕하세요. 견적 좀 보내주세요. 빨리요.')에서 빠진 요소를 아래에 적으세요.\n· ① 제목: (있음/없음, 문제점)\n· ② 인사·소개: (있음/없음, 문제점)\n· ③ 용건(두괄식): (있음/없음, 문제점)\n· ④ 세부 내용: (있음/없음, 문제점)\n· ⑤ 맺음·서명: (있음/없음, 문제점)",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. 내가 직접 고쳐 쓴 이메일",
+      "guide": "5가지 구성 요소를 모두 갖춰 이메일을 새로 작성해 적으세요. (AI 도움 없이 먼저 해보세요!)",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. AI 보완 요청 결과",
+      "guide": "내가 고쳐 쓴 이메일을 AI에게 보여주고 추가 보완을 받은 결과를 캡처하거나 붙여넣으세요.",
+      "allowText": true,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. 내 버전과 AI 보완본 비교 소감",
+      "guide": "둘을 비교했을 때 달라진 점과 느낀 점을 한두 줄로 적으세요.",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    }
+  ]
+}

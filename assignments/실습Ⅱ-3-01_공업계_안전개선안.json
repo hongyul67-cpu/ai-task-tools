@@ -1,0 +1,58 @@
+{
+  "formatVersion": "1.0",
+  "assignmentTitle": "실습Ⅱ-3-01  [공업계] 현장 안전사고 예방 개선안 작성 〔필수·계열택1〕",
+  "subject": "인공지능(AI)과 직업생활",
+  "teacher": "윤홍열 선생님",
+  "description": "프레스 작업장 끼임 사고 가정 시나리오를 바탕으로 AI와 함께 안전사고 예방 보고서를 작성합니다.",
+  "studentFields": [
+    {
+      "key": "className",
+      "label": "학반",
+      "placeholder": "예: 2학년 3반"
+    },
+    {
+      "key": "studentId",
+      "label": "학번",
+      "placeholder": "예: 20312"
+    },
+    {
+      "key": "studentName",
+      "label": "이름",
+      "placeholder": "예: 홍길동"
+    }
+  ],
+  "tasks": [
+    {
+      "id": "q1",
+      "title": "1. AI에게 입력한 프롬프트",
+      "guide": "보고서 작성을 요청할 때 입력한 프롬프트를 그대로 적으세요. (역할·목차·형식이 포함됐는지 확인하세요)",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q2",
+      "title": "2. AI가 작성한 보고서 초안",
+      "guide": "AI가 만들어 준 보고서를 붙여넣거나 캡처해 넣으세요.",
+      "allowText": true,
+      "allowImage": true,
+      "allowLink": false
+    },
+    {
+      "id": "q3",
+      "title": "3. 검토 체크리스트",
+      "guide": "아래 항목을 점검하고 결과를 적으세요.\n· AI 내용이 현실적인가? (예/아니오, 이유):\n· 우리 학교 실습실 상황에 맞게 수정한 부분:\n· 보고서 어조가 적절한가? (예/아니오):",
+      "allowText": true,
+      "allowImage": false,
+      "allowLink": false
+    },
+    {
+      "id": "q4",
+      "title": "4. 수정 후 최종 보고서",
+      "guide": "검토 후 수정한 최종 보고서를 붙여넣거나 캡처해 제출하세요.",
+      "allowText": true,
+      "allowImage": true,
+      "allowLink": false
+    }
+  ]
+}
