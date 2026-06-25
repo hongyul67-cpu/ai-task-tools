@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 실습과제 - 작성 및 제출</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--warn:#e8730c;--ok:#1f9d57;--paper:#fff;--soft:#eef3ff;--danger:#d6483b;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-text-size-adjust:100%;}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px 130px;}
+.topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:1px solid var(--line);padding:10px 14px;margin:-16px -14px 16px;display:flex;align-items:center;gap:8px;}
+.topbar h1{font-size:15px;margin:0;flex:1;font-weight:800;letter-spacing:-.3px;}
+.dot{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#7aa2ff);display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;}
+.muted{color:var(--sub);font-size:13.5px;}
+.hero h2{font-size:21px;margin:2px 0 6px;letter-spacing:-.4px;}
+.steps{counter-reset:s;margin:14px 0 0;padding:0;list-style:none;}
+.steps li{counter-increment:s;position:relative;padding:8px 0 8px 38px;font-size:14px;color:var(--sub);}
+.steps li::before{content:counter(s);position:absolute;left:0;top:7px;width:24px;height:24px;background:var(--soft);color:var(--brand-d);border-radius:50%;font-weight:800;font-size:13px;display:grid;place-items:center;}
+.btn{appearance:none;border:0;border-radius:11px;padding:13px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;width:100%;transition:transform .04s,filter .15s;}
+.btn:active{transform:translateY(1px);}
+.btn-primary{background:var(--brand);color:#fff;}.btn-primary:hover{filter:brightness(1.05);}
+.btn-ghost{background:#eef1f6;color:var(--ink);}
+.btn-warn{background:var(--warn);color:#fff;}
+.btn-ok{background:var(--ok);color:#fff;}
+.btn.small{padding:9px 12px;font-size:13px;width:auto;}
+input[type=text],textarea{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14.5px;font-family:inherit;color:var(--ink);background:#fcfdff;resize:vertical;}
+input[type=text]:focus,textarea:focus{outline:none;border-color:var(--brand);}
+textarea{min-height:88px;}
+label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:0 0 5px;}
+.hidden{display:none!important;}
+.info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+@media(max-width:520px){.info-grid{grid-template-columns:1fr;}}
+.task-h{display:flex;align-items:flex-start;gap:8px;margin:0 0 4px;}
+.task-h .num{font-size:16px;font-weight:800;letter-spacing:-.3px;flex:1;}
+.charcount{font-size:11.5px;color:#aab;margin-top:3px;text-align:right;}
+.guide{font-size:13px;color:var(--sub);background:#f7f9fc;border-left:3px solid #c9d6ec;padding:8px 11px;border-radius:0 8px 8px 0;margin:6px 0 12px;}
+.imgwrap{display:flex;flex-wrap:wrap;gap:9px;margin-top:10px;}
+.thumb{position:relative;width:calc(33.333% - 6px);aspect-ratio:1/1;border-radius:10px;overflow:hidden;border:1px solid var(--line);background:#f0f2f6;}
+@media(max-width:520px){.thumb{width:calc(50% - 5px);}}
+.thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.thumb .del{position:absolute;top:4px;right:4px;width:24px;height:24px;border-radius:50%;background:rgba(20,25,35,.72);color:#fff;border:0;font-size:14px;cursor:pointer;line-height:24px;}
+.imgbtns{display:flex;gap:8px;margin-top:8px;}
+.imgbtn{flex:1;border:1.5px dashed #b8c4d8;border-radius:10px;background:#f8fafe;color:var(--brand-d);font-weight:700;font-size:13px;padding:10px;cursor:pointer;text-align:center;}
+.imgbtn:hover{background:#eef3ff;}
+.progress{height:6px;background:#e7ebf2;border-radius:99px;overflow:hidden;margin:10px 0 0;}
+.progress>i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),#7aa2ff);width:0;transition:width .3s;}
+.savebadge{font-size:11px;color:#9ab;background:#f4f6fa;border-radius:20px;padding:2px 8px;margin-left:6px;vertical-align:middle;}
+.savebadge.saving{color:var(--brand-d);background:var(--soft);}
+/* link */
+.linkwrap{margin-top:12px;}
+.linknotice{font-size:12px;color:#9aa4b2;line-height:1.7;background:#fafbfd;border:1px dashed #dfe4ec;border-radius:9px;padding:9px 12px;margin-bottom:10px;}
+.linknotice b{color:#7382a0;}
+.linknotice-warn{color:#c98a86;}
+.linkrow{display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;}
+.linkfields{flex:1;display:flex;flex-direction:column;gap:6px;}
+.linkfields input{width:100%;border:1.5px solid var(--line);border-radius:9px;padding:10px 11px;font-size:14px;font-family:inherit;background:#fcfdff;}
+.linkfields input:focus{outline:none;border-color:var(--brand);}
+.linkvalid{font-size:11px;padding:2px 0;height:14px;}
+.linkvalid.ok{color:var(--ok);}
+.linkvalid.err{color:var(--danger);}
+.linkdel{flex:0 0 auto;width:34px;height:38px;border:1px solid #f0cfcb;background:#fff;color:var(--danger);border-radius:9px;cursor:pointer;font-size:14px;}
+.addlink{width:100%;border:1.5px dashed #b8c4d8;border-radius:10px;background:#f8fafe;color:var(--brand-d);font-weight:700;font-size:13.5px;padding:11px;cursor:pointer;margin-top:2px;}
+.addlink:hover{background:#eef3ff;}
+/* restore banner */
+.restore-banner{background:#fff8e6;border:1px solid #f5dfa0;border-radius:12px;padding:12px 14px;margin-bottom:10px;font-size:13.5px;}
+.restore-banner strong{color:#9a6700;}
+.restore-banner .rbbtns{display:flex;gap:8px;margin-top:8px;}
+.restore-banner .rbbtns button{flex:1;padding:9px;border-radius:9px;border:0;cursor:pointer;font-size:13px;font-weight:700;font-family:inherit;}
+.restore-banner .rbbtns .yes{background:var(--warn);color:#fff;}
+.restore-banner .rbbtns .no{background:#eef1f6;color:var(--ink);}
+/* action bar */
+.actionbar{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));z-index:40;}
+.actionbar .inner{max-width:760px;margin:0 auto;display:flex;gap:8px;}
+.actionbar .btn{flex:1;}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:#1b2330;color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:90%;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.filein{display:none;}
+.footnote{font-size:12px;color:#9aa4b2;text-align:center;margin-top:8px;}
+/* preview modal */
+.overlay{position:fixed;inset:0;background:rgba(20,25,35,.55);z-index:50;display:none;align-items:flex-end;justify-content:center;}
+.overlay.show{display:flex;}
+.sheet{background:#fff;width:100%;max-width:760px;max-height:88vh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 14px 30px;}
+.sheet-head{display:flex;align-items:center;margin-bottom:14px;}
+.sheet-head h2{margin:0;flex:1;font-size:17px;}
+.sheet-close{border:0;background:#eef1f6;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:15px;}
+.pv-block{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;}
+.pv-title{font-weight:800;font-size:14px;margin-bottom:4px;}
+.pv-text{font-size:13px;background:#f7f9fc;border-radius:8px;padding:9px;white-space:pre-wrap;color:#333;}
+.pv-imgs{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;}
+.pv-imgs img{width:calc(50% - 3px);border-radius:8px;border:1px solid #e0e4ea;}
+.pv-link{font-size:12px;color:var(--brand);background:#eef3ff;border-radius:7px;padding:6px 9px;margin-top:4px;word-break:break-all;}
+.pv-fb{font-size:12px;color:#aaa;border:1px dashed #ddd;border-radius:8px;padding:8px 10px;margin-top:8px;}
+.pv-empty{font-size:12px;color:#bbb;font-style:italic;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="topbar">
+  <div class="dot">AI</div>
+  <h1 id="barTitle">AI 실습과제</h1>
+  <span id="saveBadge" class="savebadge hidden">저장됨</span>
+  <button id="resetBtn" class="btn btn-ghost small hidden" onclick="confirmReset()">처음으로</button>
+</div>
+
+<!-- START -->
+<div id="startScreen">
+  <div class="card hero">
+    <h2>실습과제 작성·제출 도구</h2>
+    <p class="muted">선생님이 나눠준 <b>과제 양식 파일</b>을 불러와 답을 채우고, PDF로 저장해 제출하세요.</p>
+    <ol class="steps">
+      <li>선생님이 준 과제 양식(.json) 불러오기</li>
+      <li>글 입력 / 사진 촬영·첨부 / 링크 첨부</li>
+      <li>제출 전 미리보기로 확인</li>
+      <li>PDF 저장 또는 공유로 제출</li>
+    </ol>
+  </div>
+  <div class="card">
+    <label class="fl">과제 양식 불러오기</label>
+    <button class="btn btn-primary" onclick="document.getElementById('formFile').click()">📂 과제 양식 파일 열기 (.json)</button>
+    <input type="file" id="formFile" class="filein" accept=".json,application/json" onchange="loadForm(event)">
+    <div style="height:10px"></div>
+    <label class="fl">작성하던 과제 이어서 하기</label>
+    <button class="btn btn-ghost" onclick="document.getElementById('resumeFile').click()">↩️ 저장한 작업파일 불러오기 (.json)</button>
+    <input type="file" id="resumeFile" class="filein" accept=".json,application/json" onchange="resumeWork(event)">
+    <p class="footnote">양식 파일이 없나요? 선생님께 과제 양식 파일을 요청하세요.</p>
+  </div>
+</div>
+
+<!-- FORM -->
+<div id="formScreen" class="hidden">
+  <div id="restoreBanner"></div>
+  <div class="card">
+    <div id="aTitle" style="font-size:18px;font-weight:800;letter-spacing:-.4px;"></div>
+    <div id="aMeta" class="muted" style="margin-top:4px;"></div>
+    <div id="aDesc" class="guide" style="margin-top:12px;"></div>
+    <div class="progress"><i id="progBar"></i></div>
+    <div style="display:flex;align-items:center;margin-top:6px;">
+      <span id="progText" class="muted" style="font-size:12.5px;flex:1;"></span>
+      <span id="autoSaveLabel" class="muted" style="font-size:11.5px;"></span>
+    </div>
+  </div>
+  <div class="card">
+    <label class="fl">제출자 정보</label>
+    <div class="info-grid" id="studentInfo"></div>
+  </div>
+  <div id="taskList"></div>
+  <p class="footnote">30초마다 자동저장됩니다. 브라우저를 닫아도 내용이 유지됩니다.</p>
+</div>
+</div>
+
+<!-- ACTION BAR -->
+<div id="actionbar" class="actionbar hidden">
+  <div class="inner">
+    <button class="btn btn-ghost small" style="flex:0 0 auto;padding:11px 12px;" onclick="saveWork()">💾 파일저장</button>
+    <button class="btn btn-ghost" onclick="openPreview()">👁 미리보기</button>
+    <button class="btn btn-ok" onclick="makePdf(true)">📤 제출(공유)</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<div id="pdfRender" style="position:fixed;left:-99999px;top:0;width:720px;background:#fff;"></div>
+
+<!-- PREVIEW MODAL -->
+<div class="overlay" id="pvOverlay" onclick="if(event.target===this)closePv()">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>제출 전 미리보기</h2>
+      <button class="sheet-close" onclick="closePv()">✕</button>
+    </div>
+    <div id="pvBody"></div>
+    <div style="display:flex;gap:9px;margin-top:14px;">
+      <button class="btn btn-ghost" onclick="closePv()">돌아가기</button>
+      <button class="btn btn-warn" onclick="closePv();makePdf(false)">📄 PDF 저장</button>
+      <button class="btn btn-ok" onclick="closePv();makePdf(true)">📤 제출(공유)</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let FORM=null, DATA={student:{},answers:{}};
+let autoSaveTimer=null;
+const AS_KEY=()=>FORM?'as_'+btoa(unescape(encodeURIComponent(FORM.assignmentTitle||'과제'))).slice(0,20):null;
+
+function toast(m,dur=2400){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),dur);}
+
+/* ── 자동저장 ── */
+function autoSave(){
+  const k=AS_KEY(); if(!k||!FORM) return;
+  try{localStorage.setItem(k,JSON.stringify({__autosave:true,ts:Date.now(),form:FORM,data:DATA}));
+    const el=document.getElementById('autoSaveLabel');
+    if(el){const now=new Date();el.textContent=`자동저장 ${now.getHours()}:${String(now.getMinutes()).padStart(2,'0')}`;}}
+  catch(e){}
+}
+function startAutoSave(){
+  if(autoSaveTimer) clearInterval(autoSaveTimer);
+  autoSaveTimer=setInterval(autoSave,30000);
+}
+function touchAutoSave(){autoSave();}
+
+/* ── 양식 불러오기 ── */
+function loadForm(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const j=JSON.parse(r.result);
+      if(!j.tasks||!Array.isArray(j.tasks)) throw 0;
+      FORM=j; DATA={student:{},answers:{}};
+      checkAutosave();
+    }catch(e){toast("양식 파일을 읽을 수 없습니다.");}
+  };
+  r.readAsText(f); ev.target.value="";
+}
+
+function checkAutosave(){
+  const k=AS_KEY(); if(!k){renderForm();return;}
+  try{
+    const raw=localStorage.getItem(k);
+    if(!raw){renderForm();return;}
+    const saved=JSON.parse(raw);
+    const ageSec=Math.round((Date.now()-saved.ts)/1000);
+    const ageStr=ageSec<60?`${ageSec}초 전`:ageSec<3600?`${Math.round(ageSec/60)}분 전`:`${Math.round(ageSec/3600)}시간 전`;
+    // show restore banner
+    document.getElementById('startScreen').classList.add('hidden');
+    document.getElementById('formScreen').classList.remove('hidden');
+    document.getElementById('actionbar').classList.remove('hidden');
+    document.getElementById('resetBtn').classList.remove('hidden');
+    document.getElementById('barTitle').textContent=FORM.subject||"AI 실습과제";
+    document.getElementById('restoreBanner').innerHTML=`
+      <div class="restore-banner">
+        <strong>⚡ 자동저장된 내용이 있습니다</strong> (${ageStr})<br>
+        <span style="font-size:12.5px;color:#666;">이어서 작성하려면 '복원'을, 새로 시작하려면 '새로 시작'을 눌러주세요.</span>
+        <div class="rbbtns">
+          <button class="yes" onclick="restoreAutosave()">✅ 복원하기</button>
+          <button class="no" onclick="discardAutosave()">🗑 새로 시작</button>
+        </div>
+      </div>`;
+    renderForm(false,true);
+  }catch(e){renderForm();}
+}
+function restoreAutosave(){
+  const k=AS_KEY(); if(!k) return;
+  try{const saved=JSON.parse(localStorage.getItem(k));DATA=saved.data;renderForm(true,false);}catch(e){}
+}
+function discardAutosave(){
+  const k=AS_KEY(); if(k) localStorage.removeItem(k);
+  document.getElementById('restoreBanner').innerHTML="";
+  DATA={student:{},answers:{}};
+  renderForm(false,false);
+}
+
+/* ── 작업 이어하기(파일) ── */
+function resumeWork(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const j=JSON.parse(r.result);
+      if(!j.__work&&!j.__autosave||!j.form) throw 0;
+      FORM=j.form; DATA=j.data; renderForm(true); toast("저장한 작업을 불러왔습니다.");
+    }catch(e){toast("작업파일이 아니거나 손상되었습니다.");}
+  };
+  r.readAsText(f); ev.target.value="";
+}
+
+/* ── 화면 그리기 ── */
+function renderForm(restore,noscroll){
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('formScreen').classList.remove('hidden');
+  document.getElementById('actionbar').classList.remove('hidden');
+  document.getElementById('resetBtn').classList.remove('hidden');
+  document.getElementById('barTitle').textContent=FORM.subject||"AI 실습과제";
+  document.getElementById('aTitle').textContent=FORM.assignmentTitle||"실습과제";
+  document.getElementById('aMeta').textContent=[FORM.subject,FORM.teacher].filter(Boolean).join("  ·  ");
+  const desc=document.getElementById('aDesc');
+  if(FORM.description){desc.textContent=FORM.description;desc.style.display='';}else desc.style.display='none';
+  const sFields=FORM.studentFields&&FORM.studentFields.length?FORM.studentFields:
+    [{key:"className",label:"학반"},{key:"studentId",label:"학번"},{key:"studentName",label:"이름"}];
+  const si=document.getElementById('studentInfo'); si.innerHTML="";
+  sFields.forEach(fld=>{
+    const d=document.createElement('div');
+    d.innerHTML=`<label class="fl">${fld.label||fld.key}</label>
+      <input type="text" placeholder="${fld.placeholder||''}" value="${ea(DATA.student[fld.key]||'')}"
+        oninput="DATA.student['${fld.key}']=this.value;updateProgress();touchAutoSave();">`;
+    si.appendChild(d);
+  });
+  const tl=document.getElementById('taskList'); tl.innerHTML="";
+  FORM.tasks.forEach((t,idx)=>{
+    if(!DATA.answers[t.id]) DATA.answers[t.id]={text:"",images:[],links:[]};
+    if(!DATA.answers[t.id].links) DATA.answers[t.id].links=[];
+    const at=t.allowText!==false, ai=t.allowImage!==false, al=t.allowLink===true;
+    const card=document.createElement('div'); card.className="card";
+    let html=`<div class="task-h"><div class="num">${eh(t.title||('항목 '+(idx+1)))}</div></div>`;
+    if(t.guide) html+=`<div class="guide">${eh(t.guide)}</div>`;
+    if(at){
+      const len=DATA.answers[t.id].text.length;
+      html+=`<textarea id="ta_${t.id}" placeholder="여기에 답을 입력하세요"
+        oninput="DATA.answers['${t.id}'].text=this.value;updateProgress();touchAutoSave();updateChar('${t.id}');">${eh(DATA.answers[t.id].text)}</textarea>
+        <div class="charcount" id="cc_${t.id}">${len}자</div>`;
+    }
+    if(ai) html+=`<div class="imgwrap" id="imgwrap_${t.id}"></div>
+      <div class="imgbtns">
+        <button class="imgbtn" onclick="document.getElementById('cam_${t.id}').click()">📷 카메라로 촬영</button>
+        <button class="imgbtn" onclick="document.getElementById('alb_${t.id}').click()">🖼️ 앨범에서 선택</button>
+      </div>
+      <input type="file" class="filein" id="cam_${t.id}" accept="image/*" capture="environment" onchange="addImages('${t.id}',event)">
+      <input type="file" class="filein" id="alb_${t.id}" accept="image/*" multiple onchange="addImages('${t.id}',event)">`;
+    if(al) html+=`<div class="linkwrap" id="linkwrap_${t.id}"></div>`;
+    card.innerHTML=html;
+    tl.appendChild(card);
+    if(ai) renderThumbs(t.id);
+    if(al) renderLinks(t.id);
+  });
+  updateProgress();
+  startAutoSave();
+  if(!noscroll) window.scrollTo(0,0);
+  document.getElementById('restoreBanner').innerHTML="";
+}
+
+function updateChar(tid){
+  const cc=document.getElementById('cc_'+tid); if(!cc) return;
+  cc.textContent=(DATA.answers[tid].text||"").length+"자";
+}
+
+/* ── 이미지 ── */
+function addImages(tid,ev){
+  const files=[...ev.target.files]; let pending=files.length;
+  files.forEach(f=>{
+    const r=new FileReader();
+    r.onload=()=>shrink(r.result,1100,d=>{DATA.answers[tid].images.push(d);pending--;if(!pending){renderThumbs(tid);updateProgress();touchAutoSave();}});
+    r.readAsDataURL(f);
+  }); ev.target.value="";
+}
+function shrink(url,mw,cb){
+  const img=new Image();
+  img.onload=()=>{let{width:w,height:h}=img;if(w>mw){h=Math.round(h*mw/w);w=mw;}const c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',.82));};
+  img.src=url;
+}
+function renderThumbs(tid){
+  const wrap=document.getElementById('imgwrap_'+tid); if(!wrap) return;
+  const imgs=DATA.answers[tid].images;
+  wrap.innerHTML=imgs.map((src,i)=>`<div class="thumb"><img src="${src}"><button class="del" onclick="delImg('${tid}',${i})">✕</button></div>`).join('');
+}
+function delImg(tid,i){DATA.answers[tid].images.splice(i,1);renderThumbs(tid);updateProgress();touchAutoSave();}
+
+/* ── 링크 ── */
+function renderLinks(tid){
+  const wrap=document.getElementById('linkwrap_'+tid); if(!wrap) return;
+  const links=DATA.answers[tid].links||[];
+  let html=`<div class="linknotice">⚠️ 링크 제출 전 <b>공유 설정</b> 확인 필수!<br>
+    구글드라이브: 공유 → <b>'링크가 있는 모든 사용자'</b>로 변경 후 복사<br>
+    유튜브: 공개 범위 <b>'일부 공개'</b> 또는 '공개'로 설정<br>
+    <span class="linknotice-warn">⛔ 비공개 상태면 선생님이 열 수 없습니다.</span></div>`;
+  html+=links.map((lk,i)=>{
+    const isUrl=lk.url&&(lk.url.startsWith('http://')||lk.url.startsWith('https://'));
+    const validHtml=lk.url?`<div class="linkvalid ${isUrl?'ok':'err'}">${isUrl?'✅ 주소 형식 정상':'⚠️ https:// 로 시작해야 합니다'}</div>`:'<div class="linkvalid"></div>';
+    return`<div class="linkrow"><div class="linkfields">
+      <input type="text" class="link-label" placeholder="이름표 (예: 홍보영상)" value="${ea(lk.label||'')}" oninput="updateLink('${tid}',${i},'label',this.value)">
+      <input type="text" class="link-url" placeholder="https:// 링크 주소 붙여넣기" value="${ea(lk.url||'')}" oninput="updateLink('${tid}',${i},'url',this.value)">
+      ${validHtml}</div>
+      <button class="linkdel" onclick="delLink('${tid}',${i})">✕</button></div>`;
+  }).join('');
+  html+=`<button class="addlink" onclick="addLink('${tid}')">🔗 링크 추가</button>`;
+  wrap.innerHTML=html;
+}
+function addLink(tid){if(!DATA.answers[tid].links)DATA.answers[tid].links=[];DATA.answers[tid].links.push({label:"",url:""});renderLinks(tid);updateProgress();}
+function updateLink(tid,i,k,v){DATA.answers[tid].links[i][k]=v;renderLinks(tid);touchAutoSave();}
+function delLink(tid,i){DATA.answers[tid].links.splice(i,1);renderLinks(tid);updateProgress();touchAutoSave();}
+
+/* ── 진행률 ── */
+function updateProgress(){
+  if(!FORM) return;
+  let total=FORM.tasks.length,done=0;
+  FORM.tasks.forEach(t=>{
+    const a=DATA.answers[t.id]||{text:"",images:[],links:[]};
+    if((a.text&&a.text.trim())||(a.images&&a.images.length)||(a.links&&a.links.some(l=>l.url&&l.url.trim()))) done++;
+  });
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('progBar').style.width=pct+"%";
+  document.getElementById('progText').textContent=`${done} / ${total} 항목 작성됨 (${pct}%)`;
+}
+
+/* ── 미리보기 ── */
+function openPreview(){
+  if(!validateInfo()) return;
+  const body=document.getElementById('pvBody');
+  let html='';
+  FORM.tasks.forEach((t,idx)=>{
+    const a=DATA.answers[t.id]||{text:'',images:[],links:[]};
+    html+=`<div class="pv-block"><div class="pv-title">${eh(t.title||'항목 '+(idx+1))}</div>`;
+    if(a.text&&a.text.trim()) html+=`<div class="pv-text">${eh(a.text)}</div>`;
+    if(a.images&&a.images.length) html+=`<div class="pv-imgs">`+a.images.map(s=>`<img src="${s}">`).join('')+`</div>`;
+    const vl=(a.links||[]).filter(l=>l.url&&l.url.trim());
+    if(vl.length) html+=vl.map(l=>`<div class="pv-link">🔗 <b>${eh(l.label||'링크')}</b><br>${eh(l.url)}</div>`).join('');
+    if(!a.text&&!a.images.length&&!vl.length) html+=`<div class="pv-empty">(미작성)</div>`;
+    html+=`<div class="pv-fb">✎ 선생님 피드백 칸 (PDF 출력 시 비어 있음)</div></div>`;
+  });
+  body.innerHTML=html;
+  document.getElementById('pvOverlay').classList.add('show');
+}
+function closePv(){document.getElementById('pvOverlay').classList.remove('show');}
+
+/* ── 작업 저장(파일) ── */
+function saveWork(){
+  const blob=new Blob([JSON.stringify({__work:true,form:FORM,data:DATA})],{type:"application/json"});
+  downloadBlob(blob,wfname()+"_작업중.json");
+  toast("작업파일을 저장했습니다.");
+}
+
+/* ── PDF 생성·제출 ── */
+async function makePdf(share){
+  if(!validateInfo()) return;
+  toast("PDF 만드는 중…",5000);
+  const html=buildPdfHtml();
+  const target=document.getElementById('pdfRender');
+  target.innerHTML=html; await waitImages(target);
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF('p','mm','a4');
+  const pW=210,pH=297,mg=10; let y=mg;
+  for(const b of target.querySelectorAll('.pdf-block')){
+    const cv=await html2canvas(b,{scale:2,backgroundColor:'#fff',useCORS:true});
+    const iw=pW-mg*2,ih=cv.height*iw/cv.width;
+    if(y+ih>pH-mg&&y>mg){pdf.addPage();y=mg;}
+    if(ih>pH-mg*2){
+      let rem=ih,sy=0,rat=cv.width/iw;
+      while(rem>0){const avail=pH-mg*2,sl=Math.min(avail,rem);const sc=document.createElement('canvas');sc.width=cv.width;sc.height=sl*rat;sc.getContext('2d').drawImage(cv,0,sy*rat,cv.width,sl*rat,0,0,cv.width,sl*rat);pdf.addImage(sc.toDataURL('image/jpeg',.9),'JPEG',mg,y,iw,sl);rem-=sl;sy+=sl;y=mg;if(rem>0)pdf.addPage();}
+    }else{pdf.addImage(cv.toDataURL('image/jpeg',.92),'JPEG',mg,y,iw,ih);y+=ih+4;}
+  }
+  // 링크 모음 페이지
+  const allLinks=[];
+  FORM.tasks.forEach((t,i)=>{const a=DATA.answers[t.id]||{};(a.links||[]).filter(l=>l.url&&l.url.trim()).forEach(l=>allLinks.push({task:t.title||'항목'+(i+1),label:l.label||'링크',url:l.url.trim()}));});
+  if(allLinks.length){
+    pdf.addPage();let ly=mg+4;
+    pdf.setFont('helvetica','bold');pdf.setFontSize(14);pdf.setTextColor(31,83,196);
+    pdf.text('첨부 링크 모음 (클릭하여 열기)',mg,ly);ly+=6;
+    pdf.setDrawColor(207,224,255);pdf.line(mg,ly,pW-mg,ly);ly+=8;
+    allLinks.forEach((lk,i)=>{
+      if(ly>pH-mg-16){pdf.addPage();ly=mg+4;}
+      pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.setTextColor(60,60,60);
+      pdf.text(`${i+1}. [${lk.task}] ${lk.label}`,mg,ly);ly+=6;
+      pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor(47,109,240);
+      const ul=pdf.splitTextToSize(lk.url,pW-mg*2);
+      pdf.textWithLink(ul[0],mg,ly,{url:lk.url});
+      for(let k=1;k<ul.length;k++){ly+=5;pdf.textWithLink(ul[k],mg,ly,{url:lk.url});}
+      ly+=10;
+    });
+    pdf.setTextColor(0,0,0);
+  }
+  const fname=wfname()+".pdf";
+  const submitData=JSON.stringify({__submission:true,form:FORM,data:DATA});
+  const dataFile=new File([submitData],wfname()+".과제제출.json",{type:"application/json"});
+  if(share&&navigator.canShare){
+    const blob=pdf.output('blob');
+    const pdfFile=new File([blob],fname,{type:'application/pdf'});
+    if(navigator.canShare({files:[pdfFile,dataFile]})){
+      try{await navigator.share({files:[pdfFile,dataFile],title:FORM.assignmentTitle,text:'실습과제 제출'});
+        target.innerHTML="";return;}catch(e){target.innerHTML="";return;}
+    }
+    if(navigator.canShare({files:[pdfFile]})){
+      try{await navigator.share({files:[pdfFile],title:FORM.assignmentTitle,text:'실습과제 제출'});
+        downloadBlob(new Blob([submitData],{type:"application/json"}),wfname()+".과제제출.json");
+        toast("PDF 공유됨. '과제제출.json'도 같이 보내주세요.");target.innerHTML="";return;}
+      catch(e){target.innerHTML="";return;}
+    }
+  }
+  pdf.save(fname);
+  if(share) downloadBlob(new Blob([submitData],{type:"application/json"}),wfname()+".과제제출.json");
+  target.innerHTML="";
+  toast(share?"PDF와 제출파일(.json)을 저장했어요. 두 파일을 선생님께 보내세요.":"PDF로 저장했습니다.");
+}
+
+function buildPdfHtml(){
+  const s=DATA.student||{};
+  const info=(FORM.studentFields||[]).map(f=>`${f.label}: ${eh(s[f.key]||'-')}`).join('  /  ');
+  const now=new Date();
+  const ds=`${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+  let h=`<div class="pdf-block" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:20px 22px;border-bottom:2px solid #2f6df0;">
+    <div style="font-size:12px;color:#2f6df0;font-weight:700;">${eh(FORM.subject||'AI 실습과제')}</div>
+    <div style="font-size:21px;font-weight:800;margin:4px 0 8px;color:#1b2330;">${eh(FORM.assignmentTitle||'실습과제')}</div>
+    <div style="font-size:13px;color:#444;">${eh(info)}</div>
+    <div style="font-size:12px;color:#888;margin-top:4px;">제출일시: ${ds}${FORM.teacher?'   ·   담당: '+eh(FORM.teacher):''}</div></div>`;
+  FORM.tasks.forEach((t,idx)=>{
+    const a=DATA.answers[t.id]||{text:'',images:[],links:[]};
+    let b=`<div class="pdf-block" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:14px 22px;">
+      <div style="font-size:15.5px;font-weight:800;color:#1b2330;margin-bottom:6px;">${eh(t.title||'항목 '+(idx+1))}</div>`;
+    if(t.guide) b+=`<div style="font-size:12px;color:#777;margin-bottom:8px;">${eh(t.guide)}</div>`;
+    if(a.text&&a.text.trim()) b+=`<div style="font-size:13.5px;color:#222;white-space:pre-wrap;background:#f7f9fc;border:1px solid #e6ebf2;border-radius:8px;padding:11px 13px;margin-bottom:8px;">${eh(a.text)}</div>`;
+    if(a.images&&a.images.length) b+=`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">`+a.images.map(src=>`<img src="${src}" style="width:calc(50% - 4px);border:1px solid #e0e4ea;border-radius:8px;">`).join('')+`</div>`;
+    const vl=(a.links||[]).filter(l=>l.url&&l.url.trim());
+    if(vl.length) b+=`<div style="margin-bottom:6px;">`+vl.map(l=>`<div style="font-size:13px;background:#eef3ff;border:1px solid #cfe0ff;border-radius:8px;padding:9px 12px;margin-bottom:6px;"><span style="font-weight:800;color:#1f53c4;">🔗 ${eh(l.label||'링크')}</span><br><span style="color:#2f6df0;word-break:break-all;font-size:12px;">${eh(l.url.trim())}</span></div>`).join('')+`</div>`;
+    if(!a.text&&!a.images.length&&!vl.length) b+=`<div style="font-size:12.5px;color:#bbb;font-style:italic;">(미작성)</div>`;
+    // 피드백 칸
+    const fb=DATA.feedback&&DATA.feedback[t.id]?DATA.feedback[t.id].trim():"";
+    if(fb) b+=`<div style="margin-top:10px;background:#fff7ec;border:1px solid #f3d9b0;border-left:4px solid #e8730c;border-radius:8px;padding:10px 13px;"><div style="font-size:11.5px;font-weight:800;color:#b3590a;margin-bottom:3px;">✎ 선생님 피드백</div><div style="font-size:13px;color:#5a4424;white-space:pre-wrap;">${eh(fb)}</div></div>`;
+    else b+=`<div style="margin-top:10px;border:1px dashed #d7dde6;border-radius:8px;padding:9px 13px 26px;"><div style="font-size:11px;font-weight:700;color:#b9c0cc;">✎ 선생님 피드백</div></div>`;
+    b+=`</div>`;
+    h+=b;
+  });
+  return h;
+}
+
+/* ── 유틸 ── */
+function validateInfo(){
+  const sFields=FORM.studentFields||[];
+  const nf=sFields.find(f=>f.key==='studentName'||f.label==='이름');
+  if(nf&&(!DATA.student[nf.key]||!DATA.student[nf.key].trim())){toast("이름을 입력하세요.");window.scrollTo(0,0);return false;}
+  return true;
+}
+function wfname(){
+  const s=DATA.student||{};
+  const who=[s.studentId,s.studentName].filter(Boolean).join('_')||'학생';
+  return ((FORM.assignmentTitle||'과제').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,40))+'_'+who;
+}
+function waitImages(el){const imgs=[...el.querySelectorAll('img')];return Promise.all(imgs.map(im=>im.complete?Promise.resolve():new Promise(r=>{im.onload=r;im.onerror=r;})));}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
+function pad(n){return String(n).padStart(2,'0');}
+function eh(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function ea(s){return String(s==null?'':s).replace(/"/g,'&quot;');}
+function confirmReset(){if(confirm("처음 화면으로 돌아갈까요? 자동저장 내용은 유지됩니다.")){if(autoSaveTimer)clearInterval(autoSaveTimer);FORM=null;DATA={student:{},answers:{}};['formScreen','actionbar'].forEach(id=>document.getElementById(id).classList.add('hidden'));['startScreen'].forEach(id=>document.getElementById(id).classList.remove('hidden'));document.getElementById('resetBtn').classList.add('hidden');document.getElementById('restoreBanner').innerHTML="";window.scrollTo(0,0);}}
+</script>
+</body>
+</html>

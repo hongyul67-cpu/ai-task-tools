@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과제 채점·피드백 (교사용)</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--warn:#e8730c;--ok:#1f9d57;--danger:#d6483b;--paper:#fff;--soft:#eef3ff;--fbg:#fff7ec;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;}
+.wrap{max-width:780px;margin:0 auto;padding:16px 14px 130px;}
+.topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 14px;margin:-16px -14px 16px;display:flex;align-items:center;gap:8px;}
+.topbar h1{font-size:16px;margin:0;flex:1;font-weight:800;letter-spacing:-.3px;}
+.dot{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--warn),#f5a25a);display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px;}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:14px;}
+.muted{color:var(--sub);font-size:13.5px;}
+.btn{appearance:none;border:0;border-radius:11px;padding:13px 16px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .04s,filter .15s;width:100%;}
+.btn:active{transform:translateY(1px);}
+.btn-warn{background:var(--warn);color:#fff;}
+.btn-ok{background:var(--ok);color:#fff;}
+.btn-ghost{background:#eef1f6;color:var(--ink);}
+.btn-danger{background:var(--danger);color:#fff;}
+.btn.sm{padding:8px 12px;font-size:13px;width:auto;border-radius:9px;}
+.filein{display:none;}
+.hidden{display:none!important;}
+.footnote{font-size:12px;color:#9aa4b2;text-align:center;margin-top:8px;}
+/* 현황 대시보드 */
+.dashboard{background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px;}
+.dashboard-head{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line);}
+.dashboard-head h3{margin:0;flex:1;font-size:15px;}
+.stat-row{display:flex;gap:0;}
+.stat{flex:1;text-align:center;padding:12px 8px;border-right:1px solid var(--line);}
+.stat:last-child{border-right:0;}
+.stat .n{font-size:22px;font-weight:800;}
+.stat .l{font-size:11.5px;color:var(--sub);margin-top:2px;}
+.stat-row .done .n{color:var(--ok);}
+.stat-row .pend .n{color:var(--warn);}
+.student-list{max-height:200px;overflow:auto;}
+.sl-item{display:flex;align-items:center;padding:9px 16px;border-bottom:1px solid var(--line);gap:10px;cursor:pointer;}
+.sl-item:last-child{border-bottom:0;}
+.sl-item:hover{background:#f8fafe;}
+.sl-badge{font-size:11px;padding:2px 8px;border-radius:20px;font-weight:700;}
+.sl-badge.done{background:#dff3e9;color:#177a44;}
+.sl-badge.pend{background:#fde8d4;color:#b3590a;}
+.sl-name{flex:1;font-size:14px;font-weight:700;}
+.sl-time{font-size:11.5px;color:var(--sub);}
+/* 답안 */
+.ans-title{font-size:16px;font-weight:800;margin-bottom:4px;}
+.ans-guide{font-size:12.5px;color:var(--sub);background:#f7f9fc;border-left:3px solid #c9d6ec;padding:7px 11px;border-radius:0 8px 8px 0;margin-bottom:10px;}
+.ans-text{font-size:14px;white-space:pre-wrap;background:#f7f9fc;border:1px solid #e6ebf2;border-radius:8px;padding:11px 13px;margin-bottom:8px;}
+.ans-imgs{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;}
+.ans-imgs img{width:calc(33.33% - 6px);border:1px solid #e0e4ea;border-radius:8px;cursor:pointer;}
+@media(max-width:520px){.ans-imgs img{width:calc(50% - 4px);}}
+.ans-link{font-size:13px;background:#eef3ff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 11px;margin-bottom:6px;word-break:break-all;}
+.ans-link a{color:var(--brand);font-weight:700;text-decoration:none;}
+.ans-empty{font-size:13px;color:#bbb;font-style:italic;margin-bottom:8px;}
+label.fl{display:block;font-size:12.5px;font-weight:800;color:var(--warn);margin:0 0 5px;}
+textarea{width:100%;border:1.5px solid #f0d6b3;border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;color:var(--ink);background:var(--fbg);resize:vertical;min-height:70px;}
+textarea:focus{outline:none;border-color:var(--warn);}
+/* 자주 쓰는 피드백 */
+.fb-quick{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+.fb-chip{font-size:12px;padding:5px 10px;border-radius:20px;border:1px solid #f0d6b3;background:#fff;color:#8a4a00;cursor:pointer;white-space:nowrap;}
+.fb-chip:hover{background:var(--fbg);}
+.fb-chip.del-mode{border-color:#f3c4bf;color:var(--danger);}
+.fb-add-row{display:flex;gap:6px;margin-top:6px;}
+.fb-add-row input{flex:1;border:1.5px solid var(--line);border-radius:9px;padding:8px 10px;font-size:13px;font-family:inherit;}
+.fb-add-row button{border:0;border-radius:9px;background:var(--ok);color:#fff;padding:8px 12px;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;}
+/* 전체 총평 */
+.overall-box{background:#eef7f0;border:1px solid #c4e3cf;border-radius:12px;padding:14px;}
+.overall-box label.fl{color:var(--ok);}
+.overall-box textarea{background:#fff;border-color:#c4e3cf;}
+/* info */
+.infobar{font-size:13px;color:var(--sub);}
+.student-name{font-size:19px;font-weight:800;}
+/* action bar */
+.actionbar{position:fixed;left:0;right:0;bottom:0;background:var(--paper);border-top:1px solid var(--line);padding:10px 14px calc(10px + env(safe-area-inset-bottom));z-index:40;}
+.actionbar .inner{max-width:780px;margin:0 auto;display:flex;gap:8px;}
+.actionbar .btn{flex:1;}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%) translateY(20px);background:#1b2330;color:#fff;padding:11px 18px;border-radius:10px;font-size:14px;font-weight:600;opacity:0;transition:.25s;z-index:60;pointer-events:none;max-width:90%;text-align:center;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:70;display:none;align-items:center;justify-content:center;padding:20px;}
+.lightbox.show{display:flex;}
+.lightbox img{max-width:100%;max-height:100%;border-radius:8px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="topbar">
+  <div class="dot">채점</div>
+  <h1 id="barTitle">과제 채점·피드백</h1>
+  <button id="resetBtn" class="btn btn-ghost sm hidden" onclick="goHome()">다른 과제</button>
+</div>
+
+<!-- START -->
+<div id="startScreen">
+  <div class="card">
+    <div style="font-size:20px;font-weight:800;margin-bottom:6px;">학생 과제 채점 도구</div>
+    <p class="muted">학생이 보낸 <b>과제제출.json</b>을 열어 답안을 확인하고, 피드백을 적은 뒤 <b>피드백 PDF</b>로 내보내 돌려줄 수 있습니다.</p>
+  </div>
+  <!-- 채점 현황 대시보드 -->
+  <div class="dashboard" id="dashboard" style="display:none;">
+    <div class="dashboard-head">
+      <h3>📊 채점 현황</h3>
+      <button class="btn btn-ghost sm" onclick="exportSummary()">📋 요약 내보내기</button>
+      <button class="btn btn-ghost sm" onclick="clearHistory()" style="margin-left:4px;">🗑 초기화</button>
+    </div>
+    <div class="stat-row">
+      <div class="stat done"><div class="n" id="st_done">0</div><div class="l">채점 완료</div></div>
+      <div class="stat pend"><div class="n" id="st_pend">0</div><div class="l">미채점</div></div>
+      <div class="stat"><div class="n" id="st_all">0</div><div class="l">전체 제출</div></div>
+    </div>
+    <div class="student-list" id="studentList"></div>
+  </div>
+  <div class="card">
+    <label class="fl" style="color:var(--sub);">학생 제출파일 열기</label>
+    <button class="btn btn-warn" onclick="document.getElementById('subFile').click()">📂 과제제출 파일 열기 (.json)</button>
+    <input type="file" id="subFile" class="filein" accept=".json,application/json" onchange="loadSub(event)">
+    <p class="footnote">학생이 제출(공유)할 때 보낸 '과제제출.json' 파일을 선택하세요.</p>
+  </div>
+</div>
+
+<!-- GRADING -->
+<div id="gradeScreen" class="hidden">
+  <div class="card">
+    <div id="aTitle" style="font-size:18px;font-weight:800;"></div>
+    <div id="aMeta" class="muted" style="margin-top:4px;"></div>
+    <hr style="border:0;border-top:1px solid var(--line);margin:12px 0;">
+    <div class="infobar" id="sInfo"></div>
+    <div class="student-name" id="sName"></div>
+  </div>
+  <!-- 자주 쓰는 피드백 -->
+  <div class="card">
+    <div style="font-size:14px;font-weight:800;margin-bottom:8px;">⚡ 자주 쓰는 피드백 문구</div>
+    <div class="fb-quick" id="fbChips"></div>
+    <div class="fb-add-row">
+      <input type="text" id="fbNewText" placeholder="새 문구 추가…" onkeydown="if(event.key==='Enter')addFbPhrase()">
+      <button onclick="addFbPhrase()">추가</button>
+    </div>
+    <div style="font-size:11.5px;color:#aab;margin-top:5px;">문구를 클릭하면 현재 포커스된 피드백칸에 추가됩니다. 🗑을 누르면 삭제.</div>
+  </div>
+  <div id="taskList"></div>
+  <div class="overall-box card">
+    <label class="fl">📝 전체 총평 (선택)</label>
+    <textarea id="overallFb" placeholder="과제 전체에 대한 종합 피드백을 적으세요." oninput="DATA.overall=this.value"></textarea>
+  </div>
+  <p class="footnote">피드백은 자동 저장되지 않습니다. [채점 저장]으로 작업을 보관하세요.</p>
+</div>
+</div>
+
+<div id="actionbar" class="actionbar hidden">
+  <div class="inner">
+    <button class="btn btn-ghost sm" style="flex:0 0 auto;padding:11px 12px;" onclick="saveGrading()">💾 채점저장</button>
+    <button class="btn btn-ok" onclick="exportPdf()">📄 피드백 PDF</button>
+  </div>
+</div>
+
+<div id="toast" class="toast"></div>
+<div class="lightbox" id="lb" onclick="this.classList.remove('show')"><img id="lbimg" src=""></div>
+<div id="pdfRender" style="position:fixed;left:-99999px;top:0;width:720px;background:#fff;"></div>
+
+<script>
+let FORM=null,DATA=null;
+let focusedFbId=null; // 현재 포커스된 피드백 textarea의 task id
+
+/* ── localStorage 키 ── */
+const LS_HISTORY='grading_history';
+const LS_PHRASES='grading_phrases';
+
+function toast(m,d=2400){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),d);}
+
+/* ── 채점 현황 ── */
+function getHistory(){try{return JSON.parse(localStorage.getItem(LS_HISTORY)||'[]');}catch(e){return [];}}
+function saveHistory(h){localStorage.setItem(LS_HISTORY,JSON.stringify(h));}
+function recordGraded(name,id,title,ts){
+  const h=getHistory();
+  const key=`${title}__${id||name}`;
+  const idx=h.findIndex(x=>x.key===key);
+  const rec={key,name,id,title,ts,done:true};
+  if(idx>=0) h[idx]=rec; else h.push(rec);
+  saveHistory(h); renderDashboard();
+}
+function renderDashboard(){
+  const h=getHistory(); if(!h.length){document.getElementById('dashboard').style.display='none';return;}
+  document.getElementById('dashboard').style.display='';
+  const done=h.filter(x=>x.done).length;
+  document.getElementById('st_done').textContent=done;
+  document.getElementById('st_pend').textContent=h.length-done;
+  document.getElementById('st_all').textContent=h.length;
+  document.getElementById('studentList').innerHTML=h.slice().reverse().map(x=>`
+    <div class="sl-item">
+      <span class="sl-badge ${x.done?'done':'pend'}">${x.done?'완료':'미완'}</span>
+      <span class="sl-name">${eh(x.name||'이름 없음')}</span>
+      <span class="sl-time">${eh(x.title||'')} · ${fmtTime(x.ts)}</span>
+    </div>`).join('');
+}
+function fmtTime(ts){if(!ts) return '';const d=new Date(ts);return `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;}
+function exportSummary(){
+  const h=getHistory(); if(!h.length){toast("채점 기록이 없습니다.");return;}
+  const lines=["채점 요약","=".repeat(40),...h.map(x=>`[${x.done?'완료':'미완'}] ${x.name||'?'} (${x.id||''}) / ${x.title||''} / ${fmtTime(x.ts)}`)];
+  downloadBlob(new Blob([lines.join('\n')],{type:'text/plain'}),`채점요약_${new Date().toISOString().slice(0,10)}.txt`);
+  toast("요약을 저장했습니다.");
+}
+function clearHistory(){if(confirm("채점 현황을 모두 지울까요?")){localStorage.removeItem(LS_HISTORY);renderDashboard();toast("초기화했습니다.");}}
+
+/* ── 자주 쓰는 피드백 ── */
+function getPhrases(){try{return JSON.parse(localStorage.getItem(LS_PHRASES)||'[]');}catch(e){return [];}}
+function savePhrases(arr){localStorage.setItem(LS_PHRASES,JSON.stringify(arr));}
+function renderPhrases(){
+  const arr=getPhrases();
+  document.getElementById('fbChips').innerHTML=arr.map((p,i)=>
+    `<span class="fb-chip" onclick="insertPhrase(${i})">${eh(p)}</span>
+     <span class="fb-chip del-mode" onclick="deletePhrase(${i})" title="삭제">🗑</span>`
+  ).join('');
+}
+function addFbPhrase(){
+  const inp=document.getElementById('fbNewText');
+  const v=inp.value.trim(); if(!v) return;
+  const arr=getPhrases(); arr.push(v); savePhrases(arr); inp.value=""; renderPhrases(); toast("문구를 추가했습니다.");
+}
+function deletePhrase(i){
+  const arr=getPhrases(); arr.splice(i,1); savePhrases(arr); renderPhrases();
+}
+function insertPhrase(i){
+  const phrase=getPhrases()[i]; if(!phrase) return;
+  // focusedFbId에 해당하는 textarea 또는 overallFb에 삽입
+  let ta;
+  if(focusedFbId==='overall') ta=document.getElementById('overallFb');
+  else if(focusedFbId) ta=document.getElementById('fb_'+focusedFbId);
+  if(!ta){toast("먼저 피드백칸을 클릭하세요.");return;}
+  const pos=ta.selectionStart||ta.value.length;
+  const v=ta.value; const ins=(v&&!v.endsWith('\n')&&pos===v.length?' ':'')+phrase;
+  ta.value=v.slice(0,pos)+ins+v.slice(pos);
+  ta.dispatchEvent(new Event('input'));
+  ta.focus();
+  toast("문구를 삽입했습니다.");
+}
+
+/* ── 제출파일 열기 ── */
+function loadSub(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const j=JSON.parse(r.result);
+      if(!j.__submission&&!j.__grading) throw 0;
+      FORM=j.form; DATA=j.data;
+      if(!DATA.feedback) DATA.feedback={};
+      if(DATA.overall===undefined) DATA.overall="";
+      renderGrade();
+    }catch(e){toast("과제제출 파일이 아니거나 손상되었습니다.");}
+  };
+  r.readAsText(f); ev.target.value="";
+}
+
+/* ── 채점 화면 ── */
+function renderGrade(){
+  document.getElementById('startScreen').classList.add('hidden');
+  document.getElementById('gradeScreen').classList.remove('hidden');
+  document.getElementById('actionbar').classList.remove('hidden');
+  document.getElementById('resetBtn').classList.remove('hidden');
+  document.getElementById('aTitle').textContent=FORM.assignmentTitle||"실습과제";
+  document.getElementById('aMeta').textContent=[FORM.subject,FORM.teacher].filter(Boolean).join("  ·  ");
+  const s=DATA.student||{};
+  document.getElementById('sInfo').textContent=(FORM.studentFields||[]).filter(f=>f.key!=='studentName').map(f=>`${f.label}: ${s[f.key]||'-'}`).join("   ");
+  const nf=(FORM.studentFields||[]).find(f=>f.key==='studentName');
+  document.getElementById('sName').textContent=nf?s[nf.key]||'(이름 없음)':'(이름 없음)';
+  document.getElementById('overallFb').value=DATA.overall||"";
+  renderPhrases();
+  const tl=document.getElementById('taskList'); tl.innerHTML="";
+  FORM.tasks.forEach((t,idx)=>{
+    const a=DATA.answers[t.id]||{text:'',images:[],links:[]};
+    const card=document.createElement('div'); card.className="card";
+    let html=`<div class="ans-title">${eh(t.title||'항목 '+(idx+1))}</div>`;
+    if(t.guide) html+=`<div class="ans-guide">${eh(t.guide)}</div>`;
+    let has=false;
+    if(a.text&&a.text.trim()){html+=`<div class="ans-text">${eh(a.text)}</div>`;has=true;}
+    if(a.images&&a.images.length){html+=`<div class="ans-imgs">`+a.images.map(src=>`<img src="${src}" onclick="zoom('${src}')">`).join('')+`</div>`;has=true;}
+    const vl=(a.links||[]).filter(l=>l.url&&l.url.trim());
+    if(vl.length){html+=vl.map(l=>`<div class="ans-link">🔗 <b>${eh(l.label||'링크')}</b><br><a href="${eh(l.url.trim())}" target="_blank">${eh(l.url.trim())}</a></div>`).join('');has=true;}
+    if(!has) html+=`<div class="ans-empty">(학생이 작성하지 않았습니다)</div>`;
+    if(!DATA.feedback[t.id]) DATA.feedback[t.id]="";
+    html+=`<label class="fl" style="margin-top:10px;">✎ 이 문항 피드백</label>
+      <textarea id="fb_${t.id}" placeholder="이 문항에 대한 피드백을 적으세요."
+        onfocus="focusedFbId='${t.id}'"
+        oninput="DATA.feedback['${t.id}']=this.value">${eh(DATA.feedback[t.id])}</textarea>`;
+    card.innerHTML=html;
+    tl.appendChild(card);
+  });
+  // 전체 총평 포커스 추적
+  document.getElementById('overallFb').addEventListener('focus',()=>focusedFbId='overall');
+  window.scrollTo(0,0);
+}
+
+function zoom(src){document.getElementById('lbimg').src=src;document.getElementById('lb').classList.add('show');}
+
+/* ── 채점 저장(이어하기) ── */
+function saveGrading(){
+  downloadBlob(new Blob([JSON.stringify({__grading:true,form:FORM,data:DATA})],{type:"application/json"}),fbase()+".채점중.json");
+  toast("채점 작업을 저장했습니다.");
+}
+
+/* ── 피드백 PDF ── */
+async function exportPdf(){
+  toast("피드백 PDF 만드는 중…",5000);
+  const html=buildPdfHtml();
+  const target=document.getElementById('pdfRender');
+  target.innerHTML=html; await waitImgs(target);
+  const {jsPDF}=window.jspdf;
+  const pdf=new jsPDF('p','mm','a4');
+  const pW=210,pH=297,mg=10; let y=mg;
+  for(const b of target.querySelectorAll('.pdf-block')){
+    const cv=await html2canvas(b,{scale:2,backgroundColor:'#fff',useCORS:true});
+    const iw=pW-mg*2,ih=cv.height*iw/cv.width;
+    if(y+ih>pH-mg&&y>mg){pdf.addPage();y=mg;}
+    if(ih>pH-mg*2){let rem=ih,sy=0,rat=cv.width/iw;while(rem>0){const sl=Math.min(pH-mg*2,rem);const sc=document.createElement('canvas');sc.width=cv.width;sc.height=sl*rat;sc.getContext('2d').drawImage(cv,0,sy*rat,cv.width,sl*rat,0,0,cv.width,sl*rat);pdf.addImage(sc.toDataURL('image/jpeg',.9),'JPEG',mg,y,iw,sl);rem-=sl;sy+=sl;y=mg;if(rem>0)pdf.addPage();}}
+    else{pdf.addImage(cv.toDataURL('image/jpeg',.92),'JPEG',mg,y,iw,ih);y+=ih+4;}
+  }
+  const allLinks=[];
+  FORM.tasks.forEach((t,i)=>{const a=DATA.answers[t.id]||{};(a.links||[]).filter(l=>l.url&&l.url.trim()).forEach(l=>allLinks.push({task:t.title||'항목'+(i+1),label:l.label||'링크',url:l.url.trim()}));});
+  if(allLinks.length){pdf.addPage();let ly=mg+4;pdf.setFont('helvetica','bold');pdf.setFontSize(14);pdf.setTextColor(31,83,196);pdf.text('첨부 링크 모음',mg,ly);ly+=8;allLinks.forEach((lk,i)=>{if(ly>pH-mg-16){pdf.addPage();ly=mg+4;}pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.setTextColor(60,60,60);pdf.text(`${i+1}. [${lk.task}] ${lk.label}`,mg,ly);ly+=6;pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor(47,109,240);const ul=pdf.splitTextToSize(lk.url,pW-mg*2);pdf.textWithLink(ul[0],mg,ly,{url:lk.url});for(let k=1;k<ul.length;k++){ly+=5;pdf.textWithLink(ul[k],mg,ly,{url:lk.url});}ly+=10;});pdf.setTextColor(0,0,0);}
+  pdf.save(fbase()+".피드백.pdf");
+  target.innerHTML="";
+  // 현황 기록
+  const s=DATA.student||{};
+  recordGraded(s.studentName||'?',s.studentId||'',FORM.assignmentTitle||'과제',Date.now());
+  toast("피드백 PDF를 저장했습니다. 학생에게 전달하세요.");
+}
+
+function buildPdfHtml(){
+  const s=DATA.student||{};
+  const info=(FORM.studentFields||[]).map(f=>`${f.label}: ${eh(s[f.key]||'-')}`).join('  /  ');
+  let h=`<div class="pdf-block" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:20px 22px;border-bottom:2px solid #e8730c;">
+    <div style="font-size:12px;color:#e8730c;font-weight:700;">${eh(FORM.subject||'AI 실습과제')} · 채점 결과</div>
+    <div style="font-size:21px;font-weight:800;margin:4px 0 8px;color:#1b2330;">${eh(FORM.assignmentTitle||'실습과제')}</div>
+    <div style="font-size:13px;color:#444;">${eh(info)}</div>
+    ${FORM.teacher?`<div style="font-size:12px;color:#888;margin-top:4px;">채점: ${eh(FORM.teacher)}</div>`:''}
+  </div>`;
+  FORM.tasks.forEach((t,idx)=>{
+    const a=DATA.answers[t.id]||{text:'',images:[],links:[]};
+    let b=`<div class="pdf-block" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:14px 22px;">
+      <div style="font-size:15.5px;font-weight:800;color:#1b2330;margin-bottom:6px;">${eh(t.title||'항목 '+(idx+1))}</div>`;
+    if(a.text&&a.text.trim()) b+=`<div style="font-size:13.5px;color:#222;white-space:pre-wrap;background:#f7f9fc;border:1px solid #e6ebf2;border-radius:8px;padding:11px 13px;margin-bottom:8px;">${eh(a.text)}</div>`;
+    if(a.images&&a.images.length) b+=`<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px;">`+a.images.map(s=>`<img src="${s}" style="width:calc(50% - 4px);border:1px solid #e0e4ea;border-radius:8px;">`).join('')+`</div>`;
+    const vl=(a.links||[]).filter(l=>l.url&&l.url.trim());
+    if(vl.length) b+=vl.map(l=>`<div style="font-size:12px;background:#eef3ff;border:1px solid #cfe0ff;border-radius:8px;padding:8px 11px;margin-bottom:6px;"><b style="color:#1f53c4;">🔗 ${eh(l.label||'링크')}</b><br><span style="color:#2f6df0;word-break:break-all;">${eh(l.url.trim())}</span></div>`).join('');
+    const fb=(DATA.feedback&&DATA.feedback[t.id])?DATA.feedback[t.id].trim():"";
+    if(fb) b+=`<div style="margin-top:10px;background:#fff7ec;border:1px solid #f3d9b0;border-left:4px solid #e8730c;border-radius:8px;padding:10px 13px;"><div style="font-size:11.5px;font-weight:800;color:#b3590a;margin-bottom:3px;">✎ 선생님 피드백</div><div style="font-size:13px;color:#5a4424;white-space:pre-wrap;">${eh(fb)}</div></div>`;
+    b+=`</div>`;
+    h+=b;
+  });
+  if(DATA.overall&&DATA.overall.trim()) h+=`<div class="pdf-block" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:14px 22px;"><div style="background:#eef7f0;border:1px solid #c4e3cf;border-left:4px solid #1f9d57;border-radius:8px;padding:12px 14px;"><div style="font-size:12px;font-weight:800;color:#177a44;margin-bottom:4px;">📝 전체 총평</div><div style="font-size:13.5px;color:#234;white-space:pre-wrap;">${eh(DATA.overall)}</div></div></div>`;
+  return h;
+}
+
+/* ── 유틸 ── */
+function fbase(){const s=DATA.student||{};const who=[s.studentId,s.studentName].filter(Boolean).join('_')||'학생';return ((FORM.assignmentTitle||'과제').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,40))+'_'+who;}
+function waitImgs(el){const imgs=[...el.querySelectorAll('img')];return Promise.all(imgs.map(im=>im.complete?Promise.resolve():new Promise(r=>{im.onload=r;im.onerror=r;})));}
+function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
+function eh(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
+function goHome(){if(confirm("다른 과제를 열까요? 저장 안 한 피드백은 사라집니다.")){FORM=null;DATA=null;focusedFbId=null;['gradeScreen','actionbar'].forEach(id=>document.getElementById(id).classList.add('hidden'));document.getElementById('startScreen').classList.remove('hidden');document.getElementById('resetBtn').classList.add('hidden');window.scrollTo(0,0);}}
+
+/* 시작 시 현황 로드 */
+renderDashboard();
+</script>
+</body>
+</html>
