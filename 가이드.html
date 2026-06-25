@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>사용 설명서 - AI 실습과제 도구</title>
+<style>
+:root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--warn:#e8730c;--ok:#1f9d57;--paper:#fff;--soft:#eef3ff;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;}
+.wrap{max-width:780px;margin:0 auto;padding:30px 18px 70px;}
+.top{margin-bottom:24px;}
+.top a{font-size:13px;color:var(--sub);text-decoration:none;}
+.top a:hover{color:var(--brand);}
+h1{font-size:25px;margin:14px 0 6px;letter-spacing:-.4px;}
+p.lead{color:var(--sub);margin:0 0 26px;font-size:14.5px;}
+.toc{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin-bottom:24px;}
+.toc h3{margin:0 0 8px;font-size:13.5px;color:var(--sub);}
+.toc ol{margin:0;padding-left:20px;font-size:13.5px;}
+.toc a{color:var(--brand-d);text-decoration:none;font-weight:600;}
+.toc a:hover{text-decoration:underline;}
+.section{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;margin-bottom:18px;}
+.section h2{font-size:18px;margin:0 0 4px;letter-spacing:-.3px;display:flex;align-items:center;gap:8px;}
+.role{display:inline-block;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;}
+.role.student{background:#eef3ff;color:#1f53c4;}
+.role.teacher{background:#fff1e6;color:#b3590a;}
+.section p.desc{color:var(--sub);font-size:13.5px;margin:6px 0 16px;}
+.steps{counter-reset:s;margin:0;padding:0;list-style:none;}
+.steps li{counter-increment:s;position:relative;padding:6px 0 14px 38px;font-size:14px;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:5px;width:25px;height:25px;background:var(--soft);color:var(--brand-d);border-radius:50%;font-weight:800;font-size:12.5px;display:grid;place-items:center;}
+.steps li b{display:block;margin-bottom:2px;}
+.steps li .sub{font-size:12.5px;color:var(--sub);}
+.note{font-size:12.5px;background:#f7f9fc;border-left:3px solid #c9d6ec;padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px;}
+.warn{font-size:12.5px;background:#fff8e8;border-left:3px solid #f0c869;padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px;color:#8a6d1a;}
+.flow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:13px;margin:14px 0 4px;}
+.flow .box{background:var(--soft);color:var(--brand-d);padding:6px 12px;border-radius:8px;font-weight:700;white-space:nowrap;}
+.flow .arrow{color:#aab;font-weight:700;}
+.tools-link{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px;}
+.tools-link a{font-size:12.5px;background:#f2f5fa;border:1px solid var(--line);border-radius:8px;padding:6px 11px;color:var(--brand-d);text-decoration:none;font-weight:700;}
+.tools-link a:hover{background:var(--soft);}
+.faq dt{font-weight:700;font-size:13.5px;margin-top:12px;}
+.faq dd{margin:4px 0 0;font-size:13px;color:var(--sub);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="index.html">← 도구 모음으로 돌아가기</a></div>
+  <h1>📖 사용 설명서</h1>
+  <p class="lead">AI 실습과제 도구 3종(양식 만들기 · 제출도구 · 채점도구)의 전체 사용 흐름과 단계별 안내입니다.</p>
+
+  <div class="toc">
+    <h3>목차</h3>
+    <ol>
+      <li><a href="#flow">전체 흐름 한눈에 보기</a></li>
+      <li><a href="#teacher-form">① 교사 - 과제 양식 만들기</a></li>
+      <li><a href="#student">② 학생 - 과제 작성·제출</a></li>
+      <li><a href="#teacher-grade">③ 교사 - 채점·피드백</a></li>
+      <li><a href="#faq">자주 묻는 질문</a></li>
+    </ol>
+  </div>
+
+  <div class="section" id="flow">
+    <h2>🔄 전체 흐름 한눈에 보기</h2>
+    <p class="desc">세 도구는 서로 자동 연결되지 않습니다. <b>JSON 파일을 직접 주고받으며</b> 사용합니다.</p>
+    <div class="flow">
+      <span class="box">교사: 양식 만들기</span><span class="arrow">→</span>
+      <span class="box">양식.json 배포</span><span class="arrow">→</span>
+      <span class="box">학생: 작성·제출</span>
+    </div>
+    <div class="flow">
+      <span class="box">제출.json + PDF 전달</span><span class="arrow">→</span>
+      <span class="box">교사: 채점</span><span class="arrow">→</span>
+      <span class="box">피드백 PDF 전달</span>
+    </div>
+    <div class="note">📌 파일 전달은 카카오톡, 이메일, 구글 클래스룸, USB 등 평소 쓰던 방법을 그대로 사용하면 됩니다. 도구가 자동으로 보내주지 않습니다.</div>
+  </div>
+
+  <div class="section" id="teacher-form">
+    <h2><span class="role teacher">교사용</span> ① 과제 양식 만들기</h2>
+    <p class="desc">학생에게 배포할 과제 양식(.json)을 만드는 도구입니다.</p>
+    <ol class="steps">
+      <li><b>기본 정보 입력</b><span class="sub">과제 제목(필수), 과목명, 담당 교사, 과제 설명을 적습니다.</span></li>
+      <li><b>질문(문항) 만들기</b><span class="sub">상단 템플릿(캡처 제출형 / 글 작성형 / 링크 제출형 / 글+사진 혼합형 / 전체 혼합형)을 누르면 자동으로 질문이 채워집니다. "질문 추가하기"로 직접 추가도 가능합니다.</span></li>
+      <li><b>문항별 옵션 설정</b><span class="sub">각 질문마다 ✏️ 글 입력 / 📷 사진 첨부 / 🔗 링크 중 학생이 쓸 수 있는 항목을 체크합니다. 여러 개 동시 선택 가능합니다.</span></li>
+      <li><b>미리보기로 확인</b><span class="sub">하단 "미리보기" 버튼으로 학생이 보게 될 화면을 점검합니다.</span></li>
+      <li><b>양식 파일 저장</b><span class="sub">"양식 파일 저장"을 누르면 <code>과제양식_제목.json</code> 파일이 다운로드됩니다.</span></li>
+      <li><b>학생에게 배포</b><span class="sub">이 .json 파일을 학급 게시판, 메신저, 클래스룸 등으로 학생에게 전달합니다.</span></li>
+    </ol>
+    <div class="note">💡 이미 만든 양식을 수정하려면 "③ 기존 양식 불러와서 수정"에서 그 .json 파일을 다시 열면 됩니다.</div>
+    <div class="tools-link"><a href="과제양식_만들기도구.html">→ 양식 만들기 도구 열기</a></div>
+  </div>
+
+  <div class="section" id="student">
+    <h2><span class="role student">학생용</span> ② 과제 작성·제출</h2>
+    <p class="desc">선생님이 준 양식(.json)을 열어 답을 작성하고 PDF로 제출하는 도구입니다.</p>
+    <ol class="steps">
+      <li><b>과제 양식 열기</b><span class="sub">"과제 양식 파일 열기"로 선생님께 받은 .json 파일을 선택합니다.</span></li>
+      <li><b>제출자 정보 입력</b><span class="sub">학반·학번·이름을 입력합니다 (이름은 필수).</span></li>
+      <li><b>문항별로 답 작성</b>
+        <span class="sub">
+          ✏️ 글 입력: 텍스트 칸에 답을 입력<br>
+          📷 사진 첨부: "카메라로 촬영" 또는 "앨범에서 선택"으로 이미지 첨부 (여러 장 가능)<br>
+          🔗 링크 첨부: 구글드라이브/유튜브 등의 링크를 붙여넣기 (공유 설정을 "링크가 있는 모든 사용자"로 바꿔야 선생님이 열 수 있음)
+        </span>
+      </li>
+      <li><b>자동저장 확인</b><span class="sub">30초마다 자동으로 저장되며, 브라우저를 꺼도 같은 기기·브라우저에서는 이어서 작성할 수 있습니다.</span></li>
+      <li><b>미리보기로 점검</b><span class="sub">"미리보기" 버튼으로 빠진 항목이 없는지 확인합니다.</span></li>
+      <li><b>제출(공유) 또는 PDF 저장</b><span class="sub">"제출(공유)"을 누르면 PDF와 <code>과제제출.json</code> 파일이 함께 만들어집니다. 모바일에서는 공유 시트가 열려 카카오톡·메일 등으로 바로 보낼 수 있습니다.</span></li>
+      <li><b>선생님께 전달</b><span class="sub">PDF와 .json 파일 <u>두 개 모두</u> 선생님께 보내야 채점이 가능합니다.</span></li>
+    </ol>
+    <div class="warn">⚠️ PDF만 보내면 선생님이 채점도구에서 열 수 없습니다. <code>.과제제출.json</code> 파일도 꼭 같이 보내주세요.</div>
+    <div class="note">💾 "파일저장" 버튼으로 작업 중인 내용을 .json으로 저장해두면, 다른 기기에서도 "작성하던 과제 이어서 하기"로 이어서 작성할 수 있습니다.</div>
+    <div class="tools-link"><a href="AI실습과제_제출도구.html">→ 제출도구 열기</a></div>
+  </div>
+
+  <div class="section" id="teacher-grade">
+    <h2><span class="role teacher">교사용</span> ③ 채점·피드백</h2>
+    <p class="desc">학생이 보낸 제출파일(.json)을 열어 채점하고 피드백 PDF를 만드는 도구입니다.</p>
+    <ol class="steps">
+      <li><b>제출파일 열기</b><span class="sub">"과제제출 파일 열기"로 학생에게 받은 <code>.과제제출.json</code> 파일을 선택합니다.</span></li>
+      <li><b>답안 확인</b><span class="sub">학생이 작성한 글, 첨부한 사진(클릭하면 확대), 링크(클릭하면 새 탭에서 열림)를 확인합니다.</span></li>
+      <li><b>문항별 피드백 작성</b><span class="sub">각 문항 아래 피드백 칸에 의견을 적습니다. 자주 쓰는 문구는 "⚡ 자주 쓰는 피드백" 영역에 등록해두면 클릭 한 번으로 삽입할 수 있습니다.</span></li>
+      <li><b>전체 총평 작성 (선택)</b><span class="sub">맨 아래 "전체 총평" 칸에 종합 의견을 남길 수 있습니다.</span></li>
+      <li><b>피드백 PDF 저장</b><span class="sub">"피드백 PDF" 버튼을 누르면 학생 답안 + 피드백이 합쳐진 PDF가 다운로드됩니다.</span></li>
+      <li><b>학생에게 전달</b><span class="sub">완성된 PDF를 학생에게 다시 보내줍니다.</span></li>
+    </ol>
+    <div class="note">📊 화면 상단의 "채점 현황" 대시보드는 같은 브라우저에서 채점한 학생 목록을 자동으로 기록해 보여줍니다 (브라우저 기기 안에만 저장됨).</div>
+    <div class="note">💾 채점을 다 못 끝냈다면 "채점저장"으로 진행 중인 내용을 .json으로 저장해두고, 나중에 다시 열어 이어서 채점할 수 있습니다.</div>
+    <div class="tools-link"><a href="과제채점_도구_교사용.html">→ 채점도구 열기</a></div>
+  </div>
+
+  <div class="section" id="faq">
+    <h2>❓ 자주 묻는 질문</h2>
+    <dl class="faq">
+      <dt>인터넷이 없어도 쓸 수 있나요?</dt>
+      <dd>페이지를 한 번 열면 그 다음부터는 인터넷 연결 없이도 작동합니다(단, 처음 접속할 때는 필요).</dd>
+      <dt>학생 답변이 외부 서버로 전송되나요?</dt>
+      <dd>아니요. 모든 데이터는 학생의 브라우저 안에서만 처리되고, 사람이 직접 파일로 내보내 전달하는 방식입니다. 자동으로 어디에도 업로드되지 않습니다.</dd>
+      <dt>브라우저를 바꾸거나 기기를 바꾸면 작성한 내용이 사라지나요?</dt>
+      <dd>자동저장은 같은 브라우저·같은 기기에만 남습니다. 다른 기기로 이어서 작성하려면 "파일저장"으로 작업파일(.json)을 받아 새 기기에서 "작성하던 과제 이어서 하기"로 불러오세요.</dd>
+      <dt>제출할 때 어떤 파일들을 보내야 하나요?</dt>
+      <dd>PDF와 <code>.과제제출.json</code> 파일 두 개를 모두 선생님께 보내야 합니다. PDF는 보기용, .json은 채점도구에서 여는 용도입니다.</dd>
+      <dt>링크를 첨부했는데 선생님이 못 열어요.</dt>
+      <dd>구글드라이브는 공유 설정을 "링크가 있는 모든 사용자"로, 유튜브는 공개 범위를 "공개" 또는 "일부 공개"로 바꿔야 합니다. 비공개 상태면 선생님이 열 수 없습니다.</dd>
+    </dl>
+  </div>
+</div>
+</body>
+</html>
