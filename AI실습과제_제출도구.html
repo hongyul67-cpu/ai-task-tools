@@ -316,16 +316,7 @@ function renderForm(restore,noscroll){
   const si=document.getElementById('studentInfo'); si.innerHTML="";
   sFields.forEach(fld=>{
     const d=document.createElement('div');
-    if(fld.type==='select'){
-      const opts=fld.options||[];
-      const cur=DATA.student[fld.key]||'';
-      d.innerHTML=`<label class="fl">${eh(fld.label||fld.key)}</label>
-        <select id="sel_${fld.key}" style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14.5px;font-family:inherit;color:var(--ink);background:#fcfdff;"
-          onchange="DATA.student['${fld.key}']=this.value;updateProgress();touchAutoSave();">
-          <option value="">선택하세요</option>
-          ${opts.map(o=>`<option value="${ea(o)}" ${cur===o?'selected':''}>${eh(o)}</option>`).join('')}
-        </select>`;
-    }else if(fld.type==='number'){
+    if(fld.type==='number'){
       d.innerHTML=`<label class="fl">${eh(fld.label||fld.key)}</label>
         <div style="display:flex;align-items:center;gap:6px;">
           <input type="text" inputmode="numeric" maxlength="2" placeholder="${fld.placeholder||'예: 5'}" value="${ea(DATA.student[fld.key]||'')}"

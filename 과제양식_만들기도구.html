@@ -133,11 +133,7 @@ textarea{min-height:60px;}
     <label class="chk"><input type="checkbox" id="sf_name" checked disabled> 이름 (필수)</label>
   </div>
   <div class="checks" style="margin-top:10px;">
-    <label class="chk"><input type="checkbox" id="sf_dept" onchange="toggleDeptBox()"> 학과 표시 (특성화고 등)</label>
-  </div>
-  <div id="deptBox" style="display:none;margin-top:10px;">
-    <label class="fl">학과 목록 (쉼표 또는 줄바꿈으로 구분)</label>
-    <textarea id="sf_dept_list" placeholder="예: 전기과, 기계과, 경영정보과"></textarea>
+    <label class="chk"><input type="checkbox" id="sf_dept"> 학과 표시 (특성화고 등, 직접 입력)</label>
   </div>
 </div>
 </div>
@@ -226,10 +222,7 @@ function loadExisting(ev){
       const sf=j.studentFields||[];
       document.getElementById('sf_class').checked=sf.some(f=>f.key==='className');
       document.getElementById('sf_id').checked=sf.some(f=>f.key==='studentId');
-      const deptField=sf.find(f=>f.key==='department');
-      document.getElementById('sf_dept').checked=!!deptField;
-      document.getElementById('sf_dept_list').value=(deptField&&deptField.options)?deptField.options.join(', '):'';
-      toggleDeptBox();
+      document.getElementById('sf_dept').checked=sf.some(f=>f.key==='department');
       // 질문 불러오기
       questions=[];
       j.tasks.forEach(t=>addQ({title:t.title||'',guide:t.guide||'',allowText:!!t.allowText,allowImage:!!t.allowImage,allowLink:!!t.allowLink}));
@@ -313,10 +306,7 @@ function renderQs(){
 function buildJson(){
   const sf=[];
   if(document.getElementById('sf_class').checked) sf.push({key:"className",label:"학반",placeholder:"예: 2학년 3반"});
-  if(document.getElementById('sf_dept').checked){
-    const opts=document.getElementById('sf_dept_list').value.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
-    sf.push({key:"department",label:"학과",type:"select",options:opts});
-  }
+  if(document.getElementById('sf_dept').checked) sf.push({key:"department",label:"학과",placeholder:"예: 전기과"});
   if(document.getElementById('sf_id').checked) sf.push({key:"studentId",label:"학번",type:"number",placeholder:"예: 5"});
   sf.push({key:"studentName",label:"이름",placeholder:"예: 홍길동"});
   return {
@@ -334,10 +324,8 @@ function validate(){
   if(!document.getElementById('f_title').value.trim()){toast("과제 제목을 입력하세요.");document.getElementById('f_title').focus();return false;}
   if(!questions.length){toast("질문을 최소 1개 이상 추가하세요.");return false;}
   for(const q of questions) if(!q.title.trim()){toast("제목이 빈 질문이 있습니다.");return false;}
-  if(document.getElementById('sf_dept').checked&&!document.getElementById('sf_dept_list').value.trim()){toast("학과 목록을 1개 이상 입력하세요.");return false;}
   return true;
 }
-function toggleDeptBox(){document.getElementById('deptBox').style.display=document.getElementById('sf_dept').checked?'':'none';}
 
 async function downloadForm(){
   if(!validate()) return;
