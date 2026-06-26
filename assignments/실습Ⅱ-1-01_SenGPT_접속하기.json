@@ -13,7 +13,8 @@
     {
       "key": "studentId",
       "label": "학번",
-      "placeholder": "예: 20312"
+      "placeholder": "예: 5",
+      "type": "number"
     },
     {
       "key": "studentName",
