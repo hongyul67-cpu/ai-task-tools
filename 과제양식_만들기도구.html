@@ -8,7 +8,7 @@
 :root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--warn:#e8730c;--ok:#1f9d57;--danger:#d6483b;--paper:#fff;--soft:#eef3ff;}
 *{box-sizing:border-box;}
 body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;}
-.wrap{max-width:780px;margin:0 auto;padding:16px 14px 140px;}
+.wrap{max-width:780px;margin:0 auto;padding:16px 14px calc(150px + env(safe-area-inset-bottom));}
 .topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 14px;margin:-16px -14px 16px;display:flex;align-items:center;gap:10px;}
 .topbar h1{font-size:16px;margin:0;flex:1;font-weight:800;letter-spacing:-.3px;}
 .dot{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--ok),#5ec98a);display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px;}
@@ -58,7 +58,7 @@ textarea{min-height:60px;}
 /* preview */
 .overlay{position:fixed;inset:0;background:rgba(20,25,35,.5);z-index:50;display:none;align-items:flex-end;justify-content:center;}
 .overlay.show{display:flex;}
-.sheet{background:#fff;width:100%;max-width:780px;max-height:86vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px 30px;}
+.sheet{background:#fff;width:100%;max-width:780px;max-height:78vh;overflow:auto;border-radius:18px 18px 0 0;padding:18px 16px 30px;}
 .sheet-head{display:flex;align-items:center;margin-bottom:14px;}
 .sheet-head h2{margin:0;flex:1;font-size:17px;}
 .closex{border:0;background:#eef1f6;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:15px;}
@@ -126,18 +126,25 @@ textarea{min-height:60px;}
 
 <div class="card">
   <h3>④ 제출자 정보 칸</h3>
-  <p class="desc">보통 그대로 두시면 됩니다.</p>
+  <p class="desc">보통 그대로 두시면 됩니다. 학번은 반에서 부르는 출석번호(예: 5 → "05번"으로 표시)만 입력받습니다.</p>
   <div class="checks">
     <label class="chk"><input type="checkbox" id="sf_class" checked> 학반</label>
-    <label class="chk"><input type="checkbox" id="sf_id" checked> 학번</label>
+    <label class="chk"><input type="checkbox" id="sf_id" checked> 학번(번호)</label>
     <label class="chk"><input type="checkbox" id="sf_name" checked disabled> 이름 (필수)</label>
+  </div>
+  <div class="checks" style="margin-top:10px;">
+    <label class="chk"><input type="checkbox" id="sf_dept" onchange="toggleDeptBox()"> 학과 표시 (특성화고 등)</label>
+  </div>
+  <div id="deptBox" style="display:none;margin-top:10px;">
+    <label class="fl">학과 목록 (쉼표 또는 줄바꿈으로 구분)</label>
+    <textarea id="sf_dept_list" placeholder="예: 전기과, 기계과, 경영정보과"></textarea>
   </div>
 </div>
 </div>
 
 <div class="actionbar">
   <div class="inner">
-    <button class="btn btn-ghost" style="flex:0 0 auto;" onclick="openPreview()">👁 미리보기</button>
+    <button class="btn btn-ghost" onclick="openPreview()">👁 미리보기</button>
     <button class="btn btn-ok" onclick="downloadForm()">💾 양식 파일 저장</button>
   </div>
 </div>
@@ -156,6 +163,7 @@ textarea{min-height:60px;}
   </div>
 </div>
 
+<script src="common.js"></script>
 <script>
 let questions=[], qSeq=0;
 
@@ -203,7 +211,12 @@ function loadExisting(ev){
   r.onload=()=>{
     try{
       const j=JSON.parse(r.result);
-      if(!j.tasks||!Array.isArray(j.tasks)) throw 0;
+      if(!j.tasks||!Array.isArray(j.tasks)){
+        if(j.__submission) throw "이 파일은 학생이 제출한 '과제제출' 파일입니다. 양식 파일이 아닙니다.";
+        if(j.__work) throw "이 파일은 학생의 '작업중' 파일입니다. 양식 파일이 아닙니다.";
+        if(j.__grading) throw "이 파일은 '채점중' 파일입니다. 양식 파일이 아닙니다.";
+        throw "양식 파일(.json)이 아니거나 형식이 맞지 않습니다.";
+      }
       // 기본 정보 채우기
       document.getElementById('f_title').value=j.assignmentTitle||'';
       document.getElementById('f_subject').value=j.subject||'';
@@ -213,12 +226,16 @@ function loadExisting(ev){
       const sf=j.studentFields||[];
       document.getElementById('sf_class').checked=sf.some(f=>f.key==='className');
       document.getElementById('sf_id').checked=sf.some(f=>f.key==='studentId');
+      const deptField=sf.find(f=>f.key==='department');
+      document.getElementById('sf_dept').checked=!!deptField;
+      document.getElementById('sf_dept_list').value=(deptField&&deptField.options)?deptField.options.join(', '):'';
+      toggleDeptBox();
       // 질문 불러오기
       questions=[];
       j.tasks.forEach(t=>addQ({title:t.title||'',guide:t.guide||'',allowText:!!t.allowText,allowImage:!!t.allowImage,allowLink:!!t.allowLink}));
       toast("양식을 불러왔습니다. 수정 후 다시 저장하세요.");
       window.scrollTo(0,200);
-    }catch(e){toast("양식 파일이 아니거나 형식이 맞지 않습니다.");}
+    }catch(e){toast(typeof e==='string'?e:"양식 파일이 아니거나 형식이 맞지 않습니다.");}
   };
   r.readAsText(f); ev.target.value="";
 }
@@ -296,7 +313,11 @@ function renderQs(){
 function buildJson(){
   const sf=[];
   if(document.getElementById('sf_class').checked) sf.push({key:"className",label:"학반",placeholder:"예: 2학년 3반"});
-  if(document.getElementById('sf_id').checked) sf.push({key:"studentId",label:"학번",placeholder:"예: 20312"});
+  if(document.getElementById('sf_dept').checked){
+    const opts=document.getElementById('sf_dept_list').value.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
+    sf.push({key:"department",label:"학과",type:"select",options:opts});
+  }
+  if(document.getElementById('sf_id').checked) sf.push({key:"studentId",label:"학번",type:"number",placeholder:"예: 5"});
   sf.push({key:"studentName",label:"이름",placeholder:"예: 홍길동"});
   return {
     formatVersion:"1.0",
@@ -313,19 +334,19 @@ function validate(){
   if(!document.getElementById('f_title').value.trim()){toast("과제 제목을 입력하세요.");document.getElementById('f_title').focus();return false;}
   if(!questions.length){toast("질문을 최소 1개 이상 추가하세요.");return false;}
   for(const q of questions) if(!q.title.trim()){toast("제목이 빈 질문이 있습니다.");return false;}
+  if(document.getElementById('sf_dept').checked&&!document.getElementById('sf_dept_list').value.trim()){toast("학과 목록을 1개 이상 입력하세요.");return false;}
   return true;
 }
+function toggleDeptBox(){document.getElementById('deptBox').style.display=document.getElementById('sf_dept').checked?'':'none';}
 
-function downloadForm(){
+async function downloadForm(){
   if(!validate()) return;
   const j=buildJson();
   const blob=new Blob([JSON.stringify(j,null,2)],{type:"application/json"});
   const safe=j.assignmentTitle.replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,40);
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download=`과제양식_${safe}.json`;
-  document.body.appendChild(a);a.click();
-  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);
-  toast("양식 파일을 저장했습니다! 학생에게 배포하세요.");
+  const r=await saveFileSmart(blob,`과제양식_${safe}.json`);
+  if(r.cancelled) return;
+  toast(r.picked?"양식 파일을 저장했습니다! 학생에게 배포하세요.":"양식 파일을 다운로드 폴더에 저장했습니다! 학생에게 배포하세요. (파일 이름은 자유롭게 바꿔도 됩니다)");
 }
 
 /* ── 미리보기 ── */

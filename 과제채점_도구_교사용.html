@@ -10,7 +10,7 @@
 :root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--warn:#e8730c;--ok:#1f9d57;--danger:#d6483b;--paper:#fff;--soft:#eef3ff;--fbg:#fff7ec;}
 *{box-sizing:border-box;}
 body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;}
-.wrap{max-width:780px;margin:0 auto;padding:16px 14px 130px;}
+.wrap{max-width:780px;margin:0 auto;padding:16px 14px calc(140px + env(safe-area-inset-bottom));}
 .topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:1px solid var(--line);padding:12px 14px;margin:-16px -14px 16px;display:flex;align-items:center;gap:8px;}
 .topbar h1{font-size:16px;margin:0;flex:1;font-weight:800;letter-spacing:-.3px;}
 .dot{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--warn),#f5a25a);display:grid;place-items:center;color:#fff;font-weight:900;font-size:13px;}
@@ -117,7 +117,13 @@ textarea:focus{outline:none;border-color:var(--warn);}
     <label class="fl" style="color:var(--sub);">학생 제출파일 열기</label>
     <button class="btn btn-warn" onclick="document.getElementById('subFile').click()">📂 과제제출 파일 열기 (.json)</button>
     <input type="file" id="subFile" class="filein" accept=".json,application/json" onchange="loadSub(event)">
-    <p class="footnote">학생이 제출(공유)할 때 보낸 '과제제출.json' 파일을 선택하세요.</p>
+    <p class="footnote">학생이 제출(공유)할 때 보낸 파일을 선택하세요. 파일 이름은 자유롭게 바꿔도 되며, 내용으로 자동 인식합니다.<br>"_작업중.json"은 학생이 아직 제출하지 않은 미완성 파일이니 채점에는 쓸 수 없습니다.</p>
+  </div>
+  <div class="card">
+    <label class="fl" style="color:var(--sub);">여러 학생 응답을 한 번에 모아보기</label>
+    <button class="btn btn-ghost" onclick="document.getElementById('batchFile').click()">📊 제출파일 여러 개 선택해서 CSV로 내보내기</button>
+    <input type="file" id="batchFile" class="filein" accept=".json,application/json" multiple onchange="exportBatchCsv(event)">
+    <p class="footnote">학생들이 보낸 과제제출.json 파일들을 한꺼번에 선택하면, 글 답변을 모은 표(CSV)를 만들어줍니다. (이미지·링크는 표에 포함되지 않습니다)</p>
   </div>
 </div>
 
@@ -160,6 +166,7 @@ textarea:focus{outline:none;border-color:var(--warn);}
 <div class="lightbox" id="lb" onclick="this.classList.remove('show')"><img id="lbimg" src=""></div>
 <div id="pdfRender" style="position:fixed;left:-99999px;top:0;width:720px;background:#fff;"></div>
 
+<script src="common.js"></script>
 <script>
 let FORM=null,DATA=null;
 let focusedFbId=null; // 현재 포커스된 피드백 textarea의 task id
@@ -244,12 +251,17 @@ function loadSub(ev){
   r.onload=()=>{
     try{
       const j=JSON.parse(r.result);
-      if(!j.__submission&&!j.__grading) throw 0;
+      if(!j.__submission&&!j.__grading){
+        if(j.__work) throw "이 파일은 학생의 '작업중'(미제출) 파일입니다. 학생이 '제출(공유)'로 보낸 '과제제출.json' 파일을 받아서 열어주세요.";
+        if(j.__autosave) throw "이 파일은 학생 브라우저의 자동저장 파일입니다. 제출용 파일이 아닙니다.";
+        if(j.tasks) throw "이 파일은 '과제 양식' 파일입니다. 학생 제출 파일이 아닙니다.";
+        throw "과제제출 파일이 아니거나 손상되었습니다. (파일 이름이 아니라 내용으로 판별하니 이름은 자유롭게 바꿔도 됩니다)";
+      }
       FORM=j.form; DATA=j.data;
       if(!DATA.feedback) DATA.feedback={};
       if(DATA.overall===undefined) DATA.overall="";
       renderGrade();
-    }catch(e){toast("과제제출 파일이 아니거나 손상되었습니다.");}
+    }catch(e){toast(typeof e==='string'?e:"과제제출 파일이 아니거나 손상되었습니다.",5000);}
   };
   r.readAsText(f); ev.target.value="";
 }
@@ -263,7 +275,7 @@ function renderGrade(){
   document.getElementById('aTitle').textContent=FORM.assignmentTitle||"실습과제";
   document.getElementById('aMeta').textContent=[FORM.subject,FORM.teacher].filter(Boolean).join("  ·  ");
   const s=DATA.student||{};
-  document.getElementById('sInfo').textContent=(FORM.studentFields||[]).filter(f=>f.key!=='studentName').map(f=>`${f.label}: ${s[f.key]||'-'}`).join("   ");
+  document.getElementById('sInfo').textContent=(FORM.studentFields||[]).filter(f=>f.key!=='studentName').map(f=>`${f.label}: ${s[f.key]||'-'}${f.type==='number'&&s[f.key]?'번':''}`).join("   ");
   const nf=(FORM.studentFields||[]).find(f=>f.key==='studentName');
   document.getElementById('sName').textContent=nf?s[nf.key]||'(이름 없음)':'(이름 없음)';
   document.getElementById('overallFb').value=DATA.overall||"";
@@ -296,9 +308,10 @@ function renderGrade(){
 function zoom(src){document.getElementById('lbimg').src=src;document.getElementById('lb').classList.add('show');}
 
 /* ── 채점 저장(이어하기) ── */
-function saveGrading(){
-  downloadBlob(new Blob([JSON.stringify({__grading:true,form:FORM,data:DATA})],{type:"application/json"}),fbase()+".채점중.json");
-  toast("채점 작업을 저장했습니다.");
+async function saveGrading(){
+  const r=await saveFileSmart(new Blob([JSON.stringify({__grading:true,form:FORM,data:DATA})],{type:"application/json"}),fbase()+".채점중.json");
+  if(r.cancelled) return;
+  toast("채점 진행 상태를 저장했습니다. (학생에게 줄 최종본은 '피드백 PDF'를 사용하세요)");
 }
 
 /* ── 피드백 PDF ── */
@@ -320,17 +333,57 @@ async function exportPdf(){
   const allLinks=[];
   FORM.tasks.forEach((t,i)=>{const a=DATA.answers[t.id]||{};(a.links||[]).filter(l=>l.url&&l.url.trim()).forEach(l=>allLinks.push({task:t.title||'항목'+(i+1),label:l.label||'링크',url:l.url.trim()}));});
   if(allLinks.length){pdf.addPage();let ly=mg+4;pdf.setFont('helvetica','bold');pdf.setFontSize(14);pdf.setTextColor(31,83,196);pdf.text('첨부 링크 모음',mg,ly);ly+=8;allLinks.forEach((lk,i)=>{if(ly>pH-mg-16){pdf.addPage();ly=mg+4;}pdf.setFont('helvetica','bold');pdf.setFontSize(10);pdf.setTextColor(60,60,60);pdf.text(`${i+1}. [${lk.task}] ${lk.label}`,mg,ly);ly+=6;pdf.setFont('helvetica','normal');pdf.setFontSize(9);pdf.setTextColor(47,109,240);const ul=pdf.splitTextToSize(lk.url,pW-mg*2);pdf.textWithLink(ul[0],mg,ly,{url:lk.url});for(let k=1;k<ul.length;k++){ly+=5;pdf.textWithLink(ul[k],mg,ly,{url:lk.url});}ly+=10;});pdf.setTextColor(0,0,0);}
-  pdf.save(fbase()+".피드백.pdf");
+  const r=await saveFileSmart(pdf.output('blob'),fbase()+".피드백.pdf");
   target.innerHTML="";
+  if(r.cancelled) return;
   // 현황 기록
   const s=DATA.student||{};
   recordGraded(s.studentName||'?',s.studentId||'',FORM.assignmentTitle||'과제',Date.now());
-  toast("피드백 PDF를 저장했습니다. 학생에게 전달하세요.");
+  toast(r.picked?"피드백 PDF를 저장했습니다. 학생에게 전달하세요.":"피드백 PDF를 다운로드 폴더에 저장했습니다. 학생에게 전달하세요.");
+}
+
+/* ── 여러 학생 응답 CSV로 모아보기 ── */
+function csvEscape(v){
+  v=String(v==null?'':v).replace(/\r?\n/g,' ');
+  if(/[",]/.test(v)) v='"'+v.replace(/"/g,'""')+'"';
+  return v;
+}
+async function exportBatchCsv(ev){
+  const files=[...ev.target.files]; if(!files.length) return;
+  const rows=[]; let formRef=null; let bad=0;
+  for(const f of files){
+    try{
+      const text=await f.text();
+      const j=JSON.parse(text);
+      if((!j.__submission&&!j.__grading)||!j.form||!j.data){bad++;continue;}
+      if(!formRef) formRef=j.form;
+      rows.push(j.data);
+    }catch(e){bad++;}
+  }
+  ev.target.value="";
+  if(!rows.length){toast("불러올 수 있는 제출파일이 없습니다.");return;}
+  const sFields=formRef.studentFields||[];
+  const tasks=formRef.tasks||[];
+  const header=[...sFields.map(f=>f.label||f.key),...tasks.map((t,i)=>t.title||('항목'+(i+1)))];
+  const lines=[header.map(csvEscape).join(',')];
+  rows.forEach(d=>{
+    const s=d.student||{};
+    const cells=[
+      ...sFields.map(f=>{const v=s[f.key]||'';return f.type==='number'&&v?v+'번':v;}),
+      ...tasks.map(t=>{const a=(d.answers||{})[t.id]||{};return a.text||'';})
+    ];
+    lines.push(cells.map(csvEscape).join(','));
+  });
+  const csv='﻿'+lines.join('\r\n'); // BOM 추가: 엑셀에서 한글 깨짐 방지
+  const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+  const safe=(formRef.assignmentTitle||'과제').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,40);
+  await saveFileSmart(blob,`${safe}_응답모음.csv`);
+  toast(`${rows.length}명의 응답을 모았습니다.${bad?` (${bad}개 파일은 제출파일이 아니라 제외됨)`:''}`,4000);
 }
 
 function buildPdfHtml(){
   const s=DATA.student||{};
-  const info=(FORM.studentFields||[]).map(f=>`${f.label}: ${eh(s[f.key]||'-')}`).join('  /  ');
+  const info=(FORM.studentFields||[]).map(f=>`${f.label}: ${eh(s[f.key]||'-')}${f.type==='number'&&s[f.key]?'번':''}`).join('  /  ');
   let h=`<div class="pdf-block" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:20px 22px;border-bottom:2px solid #e8730c;">
     <div style="font-size:12px;color:#e8730c;font-weight:700;">${eh(FORM.subject||'실습과제')} · 채점 결과</div>
     <div style="font-size:21px;font-weight:800;margin:4px 0 8px;color:#1b2330;">${eh(FORM.assignmentTitle||'실습과제')}</div>

@@ -10,7 +10,7 @@
 :root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--warn:#e8730c;--ok:#1f9d57;--paper:#fff;--soft:#eef3ff;--danger:#d6483b;}
 *{box-sizing:border-box;}
 body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;-webkit-text-size-adjust:100%;}
-.wrap{max-width:760px;margin:0 auto;padding:16px 14px 130px;}
+.wrap{max-width:760px;margin:0 auto;padding:16px 14px calc(140px + env(safe-area-inset-bottom));}
 .topbar{position:sticky;top:0;z-index:30;background:var(--paper);border-bottom:1px solid var(--line);padding:10px 14px;margin:-16px -14px 16px;display:flex;align-items:center;gap:8px;}
 .topbar h1{font-size:15px;margin:0;flex:1;font-weight:800;letter-spacing:-.3px;}
 .dot{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--brand),#7aa2ff);display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;}
@@ -126,7 +126,7 @@ label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:
     <label class="fl">작성하던 과제 이어서 하기</label>
     <button class="btn btn-ghost" onclick="document.getElementById('resumeFile').click()">↩️ 저장한 작업파일 불러오기 (.json)</button>
     <input type="file" id="resumeFile" class="filein" accept=".json,application/json" onchange="resumeWork(event)">
-    <p class="footnote">양식 파일이 없나요? 선생님께 과제 양식 파일을 요청하세요.</p>
+    <p class="footnote">양식 파일이 없나요? 선생님께 과제 양식 파일을 요청하세요.<br>파일 이름은 자유롭게 바꿔도 됩니다. 내용으로 자동 인식합니다.</p>
   </div>
 </div>
 
@@ -155,7 +155,7 @@ label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:
 <!-- ACTION BAR -->
 <div id="actionbar" class="actionbar hidden">
   <div class="inner">
-    <button class="btn btn-ghost small" style="flex:0 0 auto;padding:11px 12px;" onclick="saveWork()">💾 파일저장</button>
+    <button class="btn btn-ghost small" style="flex:0 0 auto;padding:11px 12px;" onclick="saveWork()" title="진행 상태만 저장 (제출 아님)">💾 작업저장</button>
     <button class="btn btn-ghost" onclick="openPreview()">👁 미리보기</button>
     <button class="btn btn-ok" onclick="makePdf(true)">📤 제출(공유)</button>
   </div>
@@ -180,6 +180,7 @@ label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:
   </div>
 </div>
 
+<script src="common.js"></script>
 <script>
 let FORM=null, DATA={student:{},answers:{}};
 let autoSaveTimer=null;
@@ -209,13 +210,18 @@ function loadForm(ev){
     try{
       const j=JSON.parse(r.result);
       applyForm(j);
-    }catch(e){toast("양식 파일을 읽을 수 없습니다.");}
+    }catch(e){toast(typeof e==='string'?e:"양식 파일을 읽을 수 없습니다.");}
   };
   r.readAsText(f); ev.target.value="";
 }
 
 function applyForm(j){
-  if(!j.tasks||!Array.isArray(j.tasks)) throw 0;
+  if(!j.tasks||!Array.isArray(j.tasks)){
+    if(j.__submission) throw "이 파일은 '과제제출' 파일입니다. 양식 파일이 아닙니다.";
+    if(j.__work||j.__autosave) throw "이 파일은 '작업중' 파일입니다. 아래 '작업파일 불러오기'를 이용하세요.";
+    if(j.__grading) throw "이 파일은 선생님의 '채점중' 파일입니다.";
+    throw "양식 파일(.json)이 아니거나 형식이 맞지 않습니다.";
+  }
   FORM=j; DATA={student:{},answers:{}};
   checkAutosave();
 }
@@ -282,9 +288,14 @@ function resumeWork(ev){
   r.onload=()=>{
     try{
       const j=JSON.parse(r.result);
-      if(!j.__work&&!j.__autosave||!j.form) throw 0;
+      if((!j.__work&&!j.__autosave)||!j.form){
+        if(j.__submission) throw "이 파일은 이미 제출한 '과제제출' 파일입니다. '이어서 하기'에는 작업중 파일만 사용하세요.";
+        if(j.__grading) throw "이 파일은 선생님의 '채점중' 파일입니다. 학생용 작업파일이 아닙니다.";
+        if(j.tasks) throw "이 파일은 '과제 양식' 파일입니다. 위쪽 '과제 양식 파일 열기'를 이용하세요.";
+        throw "작업파일이 아니거나 손상되었습니다. (파일 이름은 상관없으며 내용으로 판별합니다)";
+      }
       FORM=j.form; DATA=j.data; renderForm(true); toast("저장한 작업을 불러왔습니다.");
-    }catch(e){toast("작업파일이 아니거나 손상되었습니다.");}
+    }catch(e){toast(typeof e==='string'?e:"작업파일이 아니거나 손상되었습니다.");}
   };
   r.readAsText(f); ev.target.value="";
 }
@@ -305,9 +316,28 @@ function renderForm(restore,noscroll){
   const si=document.getElementById('studentInfo'); si.innerHTML="";
   sFields.forEach(fld=>{
     const d=document.createElement('div');
-    d.innerHTML=`<label class="fl">${fld.label||fld.key}</label>
-      <input type="text" placeholder="${fld.placeholder||''}" value="${ea(DATA.student[fld.key]||'')}"
-        oninput="DATA.student['${fld.key}']=this.value;updateProgress();touchAutoSave();">`;
+    if(fld.type==='select'){
+      const opts=fld.options||[];
+      const cur=DATA.student[fld.key]||'';
+      d.innerHTML=`<label class="fl">${eh(fld.label||fld.key)}</label>
+        <select id="sel_${fld.key}" style="width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14.5px;font-family:inherit;color:var(--ink);background:#fcfdff;"
+          onchange="DATA.student['${fld.key}']=this.value;updateProgress();touchAutoSave();">
+          <option value="">선택하세요</option>
+          ${opts.map(o=>`<option value="${ea(o)}" ${cur===o?'selected':''}>${eh(o)}</option>`).join('')}
+        </select>`;
+    }else if(fld.type==='number'){
+      d.innerHTML=`<label class="fl">${eh(fld.label||fld.key)}</label>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="text" inputmode="numeric" maxlength="2" placeholder="${fld.placeholder||'예: 5'}" value="${ea(DATA.student[fld.key]||'')}"
+            oninput="this.value=this.value.replace(/[^0-9]/g,'').slice(0,2);DATA.student['${fld.key}']=this.value;updateProgress();touchAutoSave();"
+            onblur="if(this.value)this.value=this.value.padStart(2,'0');DATA.student['${fld.key}']=this.value;">
+          <span class="muted" style="white-space:nowrap;">번</span>
+        </div>`;
+    }else{
+      d.innerHTML=`<label class="fl">${eh(fld.label||fld.key)}</label>
+        <input type="text" placeholder="${fld.placeholder||''}" value="${ea(DATA.student[fld.key]||'')}"
+          oninput="DATA.student['${fld.key}']=this.value;updateProgress();touchAutoSave();">`;
+    }
     si.appendChild(d);
   });
   const tl=document.getElementById('taskList'); tl.innerHTML="";
@@ -427,10 +457,11 @@ function openPreview(){
 function closePv(){document.getElementById('pvOverlay').classList.remove('show');}
 
 /* ── 작업 저장(파일) ── */
-function saveWork(){
+async function saveWork(){
   const blob=new Blob([JSON.stringify({__work:true,form:FORM,data:DATA})],{type:"application/json"});
-  downloadBlob(blob,wfname()+"_작업중.json");
-  toast("작업파일을 저장했습니다.");
+  const r=await saveFileSmart(blob,wfname()+"_작업중.json");
+  if(r.cancelled) return;
+  toast("작업 진행 상태만 저장했습니다 (PDF 아님). 나중에 '작업파일 불러오기'로 이어서 할 수 있어요. 제출하려면 '제출(공유)'를 누르세요.");
 }
 
 /* ── PDF 생성·제출 ── */
@@ -483,21 +514,29 @@ async function makePdf(share){
         target.innerHTML="";return;}catch(e){target.innerHTML="";return;}
     }
     if(navigator.canShare({files:[pdfFile]})){
-      try{await navigator.share({files:[pdfFile],title:FORM.assignmentTitle,text:'실습과제 제출'});
-        downloadBlob(new Blob([submitData],{type:"application/json"}),wfname()+".과제제출.json");
-        toast("PDF 공유됨. '과제제출.json'도 같이 보내주세요.");target.innerHTML="";return;}
-      catch(e){target.innerHTML="";return;}
+      try{
+        await navigator.share({files:[pdfFile],title:FORM.assignmentTitle,text:'실습과제 제출'});
+        await saveFileSmart(new Blob([submitData],{type:"application/json"}),wfname()+".과제제출.json");
+        toast("⚠️ PDF는 공유했지만 '과제제출.json' 파일도 반드시 함께 선생님께 보내야 채점이 가능합니다!",5000);
+        target.innerHTML="";return;
+      }catch(e){target.innerHTML="";return;}
     }
   }
-  pdf.save(fname);
-  if(share) downloadBlob(new Blob([submitData],{type:"application/json"}),wfname()+".과제제출.json");
+  const pdfBlob=pdf.output('blob');
+  const r1=await saveFileSmart(pdfBlob,fname);
+  if(r1.cancelled){target.innerHTML="";return;}
+  if(share){
+    const r2=await saveFileSmart(new Blob([submitData],{type:"application/json"}),wfname()+".과제제출.json");
+    if(!r2.cancelled) toast("PDF와 제출파일(.json) 두 개를 저장했어요. 두 파일 모두 선생님께 보내세요.",4000);
+  }else{
+    toast(r1.picked?"PDF를 저장했습니다.":"PDF를 다운로드 폴더에 저장했습니다.");
+  }
   target.innerHTML="";
-  toast(share?"PDF와 제출파일(.json)을 저장했어요. 두 파일을 선생님께 보내세요.":"PDF로 저장했습니다.");
 }
 
 function buildPdfHtml(){
   const s=DATA.student||{};
-  const info=(FORM.studentFields||[]).map(f=>`${f.label}: ${eh(s[f.key]||'-')}`).join('  /  ');
+  const info=(FORM.studentFields||[]).map(f=>`${f.label}: ${eh(s[f.key]||'-')}${f.type==='number'&&s[f.key]?'번':''}`).join('  /  ');
   const now=new Date();
   const ds=`${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
   let h=`<div class="pdf-block" style="font-family:'Malgun Gothic','맑은 고딕',sans-serif;padding:20px 22px;border-bottom:2px solid #2f6df0;">
