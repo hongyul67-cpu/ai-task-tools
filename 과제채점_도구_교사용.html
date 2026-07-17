@@ -151,7 +151,7 @@ textarea:focus{outline:none;border-color:var(--warn);}
     <label class="fl">📝 전체 총평 (선택)</label>
     <textarea id="overallFb" placeholder="과제 전체에 대한 종합 피드백을 적으세요." oninput="DATA.overall=this.value"></textarea>
   </div>
-  <p class="footnote">피드백은 자동 저장되지 않습니다. [채점 저장]으로 작업을 보관하세요.</p>
+  <p class="footnote">피드백은 이 브라우저에 30초마다 자동 임시저장됩니다. 다른 기기로 옮기려면 [채점저장]을, 학생에게 줄 최종본은 [피드백 PDF]를 사용하세요.</p>
 </div>
 </div>
 
@@ -174,8 +174,19 @@ let focusedFbId=null; // 현재 포커스된 피드백 textarea의 task id
 /* ── localStorage 키 ── */
 const LS_HISTORY='grading_history';
 const LS_PHRASES='grading_phrases';
+let gradeAutoTimer=null;
 
 function toast(m,d=2400){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),d);}
+
+/* ── 피드백 자동 임시저장 (이 브라우저에만) ── */
+function hashStr(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h)^s.charCodeAt(i);}return (h>>>0).toString(36);}
+function gradeKey(){if(!FORM||!DATA) return null;const s=DATA.student||{};return 'gradefb_'+hashStr((FORM.assignmentTitle||'')+'|'+(s.studentId||'')+'|'+(s.studentName||''));}
+function autoSaveGrade(){
+  const k=gradeKey(); if(!k) return;
+  try{localStorage.setItem(k,JSON.stringify({ts:Date.now(),feedback:DATA.feedback||{},overall:DATA.overall||""}));}catch(e){}
+}
+function startGradeAutoSave(){if(gradeAutoTimer)clearInterval(gradeAutoTimer);gradeAutoTimer=setInterval(autoSaveGrade,30000);}
+function clearGradeDraft(){const k=gradeKey();if(k)try{localStorage.removeItem(k);}catch(e){}}
 
 /* ── 채점 현황 ── */
 function getHistory(){try{return JSON.parse(localStorage.getItem(LS_HISTORY)||'[]');}catch(e){return [];}}
@@ -260,6 +271,21 @@ function loadSub(ev){
       FORM=j.form; DATA=j.data;
       if(!DATA.feedback) DATA.feedback={};
       if(DATA.overall===undefined) DATA.overall="";
+      // 이전에 저장하던 피드백 임시본이 있으면 복원 제안
+      const k=gradeKey();
+      if(k){
+        try{
+          const raw=localStorage.getItem(k);
+          if(raw){
+            const sv=JSON.parse(raw);
+            const hasContent=(sv.overall&&sv.overall.trim())||Object.values(sv.feedback||{}).some(v=>v&&v.trim());
+            if(hasContent&&confirm("이 학생에 대해 저장하던 피드백이 있습니다. 불러올까요?\n(취소하면 제출파일의 내용으로 시작합니다)")){
+              DATA.feedback=Object.assign({},DATA.feedback,sv.feedback||{});
+              if(sv.overall) DATA.overall=sv.overall;
+            }
+          }
+        }catch(e){}
+      }
       renderGrade();
     }catch(e){toast(typeof e==='string'?e:"과제제출 파일이 아니거나 손상되었습니다.",5000);}
   };
@@ -278,7 +304,9 @@ function renderGrade(){
   document.getElementById('sInfo').textContent=(FORM.studentFields||[]).filter(f=>f.key!=='studentName').map(f=>`${f.label}: ${s[f.key]||'-'}${f.type==='number'&&s[f.key]?'번':''}`).join("   ");
   const nf=(FORM.studentFields||[]).find(f=>f.key==='studentName');
   document.getElementById('sName').textContent=nf?s[nf.key]||'(이름 없음)':'(이름 없음)';
-  document.getElementById('overallFb').value=DATA.overall||"";
+  const ofb=document.getElementById('overallFb');
+  ofb.value=DATA.overall||"";
+  ofb.setAttribute('oninput','DATA.overall=this.value;autoSaveGrade()');
   renderPhrases();
   const tl=document.getElementById('taskList'); tl.innerHTML="";
   FORM.tasks.forEach((t,idx)=>{
@@ -296,12 +324,13 @@ function renderGrade(){
     html+=`<label class="fl" style="margin-top:10px;">✎ 이 문항 피드백</label>
       <textarea id="fb_${t.id}" placeholder="이 문항에 대한 피드백을 적으세요."
         onfocus="focusedFbId='${t.id}'"
-        oninput="DATA.feedback['${t.id}']=this.value">${eh(DATA.feedback[t.id])}</textarea>`;
+        oninput="DATA.feedback['${t.id}']=this.value;autoSaveGrade()">${eh(DATA.feedback[t.id])}</textarea>`;
     card.innerHTML=html;
     tl.appendChild(card);
   });
   // 전체 총평 포커스 추적
   document.getElementById('overallFb').addEventListener('focus',()=>focusedFbId='overall');
+  startGradeAutoSave();
   window.scrollTo(0,0);
 }
 
@@ -316,6 +345,10 @@ async function saveGrading(){
 
 /* ── 피드백 PDF ── */
 async function exportPdf(){
+  if(!window.jspdf||!window.html2canvas){
+    toast("PDF 기능을 불러오지 못했습니다. 인터넷 연결을 확인한 뒤 페이지를 새로고침해 주세요.",5000);
+    return;
+  }
   toast("피드백 PDF 만드는 중…",5000);
   const html=buildPdfHtml();
   const target=document.getElementById('pdfRender');
@@ -336,9 +369,10 @@ async function exportPdf(){
   const r=await saveFileSmart(pdf.output('blob'),fbase()+".피드백.pdf");
   target.innerHTML="";
   if(r.cancelled) return;
-  // 현황 기록
+  // 현황 기록 + 임시저장 정리
   const s=DATA.student||{};
   recordGraded(s.studentName||'?',s.studentId||'',FORM.assignmentTitle||'과제',Date.now());
+  clearGradeDraft();
   toast(r.picked?"피드백 PDF를 저장했습니다. 학생에게 전달하세요.":"피드백 PDF를 다운로드 폴더에 저장했습니다. 학생에게 전달하세요.");
 }
 
@@ -412,7 +446,7 @@ function fbase(){const s=DATA.student||{};const who=[s.studentId,s.studentName].
 function waitImgs(el){const imgs=[...el.querySelectorAll('img')];return Promise.all(imgs.map(im=>im.complete?Promise.resolve():new Promise(r=>{im.onload=r;im.onerror=r;})));}
 function downloadBlob(blob,name){const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},500);}
 function eh(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
-function goHome(){if(confirm("다른 과제를 열까요? 저장 안 한 피드백은 사라집니다.")){FORM=null;DATA=null;focusedFbId=null;['gradeScreen','actionbar'].forEach(id=>document.getElementById(id).classList.add('hidden'));document.getElementById('startScreen').classList.remove('hidden');document.getElementById('resetBtn').classList.add('hidden');window.scrollTo(0,0);}}
+function goHome(){if(confirm("다른 과제를 열까요? (지금까지 쓴 피드백은 이 브라우저에 임시저장되어, 같은 파일을 다시 열면 복원할 수 있습니다)")){autoSaveGrade();if(gradeAutoTimer)clearInterval(gradeAutoTimer);FORM=null;DATA=null;focusedFbId=null;['gradeScreen','actionbar'].forEach(id=>document.getElementById(id).classList.add('hidden'));document.getElementById('startScreen').classList.remove('hidden');document.getElementById('resetBtn').classList.add('hidden');window.scrollTo(0,0);}}
 
 /* 시작 시 현황 로드 */
 renderDashboard();
