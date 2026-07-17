@@ -97,7 +97,7 @@ textarea:focus{outline:none;border-color:var(--warn);}
 <div id="startScreen">
   <div class="card">
     <div style="font-size:20px;font-weight:800;margin-bottom:6px;">학생 과제 채점 도구</div>
-    <p class="muted">학생이 보낸 <b>과제제출.json</b>을 열어 답안을 확인하고, 피드백을 적은 뒤 <b>피드백 PDF</b>로 내보내 돌려줄 수 있습니다.</p>
+    <p class="muted">학생이 보낸 <b>과제제출 파일(.html)</b>을 열어 답안을 확인하고, 피드백을 적은 뒤 <b>피드백 PDF</b>로 내보내 돌려줄 수 있습니다. (예전 .json 제출 파일도 그대로 열립니다.)</p>
   </div>
   <!-- 채점 현황 대시보드 -->
   <div class="dashboard" id="dashboard" style="display:none;">
@@ -115,15 +115,15 @@ textarea:focus{outline:none;border-color:var(--warn);}
   </div>
   <div class="card">
     <label class="fl" style="color:var(--sub);">학생 제출파일 열기</label>
-    <button class="btn btn-warn" onclick="document.getElementById('subFile').click()">📂 과제제출 파일 열기 (.json)</button>
-    <input type="file" id="subFile" class="filein" accept=".json,application/json" onchange="loadSub(event)">
-    <p class="footnote">학생이 제출(공유)할 때 보낸 파일을 선택하세요. 파일 이름은 자유롭게 바꿔도 되며, 내용으로 자동 인식합니다.<br>"_작업중.json"은 학생이 아직 제출하지 않은 미완성 파일이니 채점에는 쓸 수 없습니다.</p>
+    <button class="btn btn-warn" onclick="document.getElementById('subFile').click()">📂 과제제출 파일 열기 (.html/.json)</button>
+    <input type="file" id="subFile" class="filein" accept=".html,.htm,.json,text/html,application/json" onchange="loadSub(event)">
+    <p class="footnote">학생이 제출(공유)할 때 보낸 파일(.html)을 선택하세요. 파일 이름은 자유롭게 바꿔도 되며, 내용으로 자동 인식합니다.<br>"_작업중.json"은 학생이 아직 제출하지 않은 미완성 파일이니 채점에는 쓸 수 없습니다.</p>
   </div>
   <div class="card">
     <label class="fl" style="color:var(--sub);">여러 학생 응답을 한 번에 모아보기</label>
     <button class="btn btn-ghost" onclick="document.getElementById('batchFile').click()">📊 제출파일 여러 개 선택해서 CSV로 내보내기</button>
-    <input type="file" id="batchFile" class="filein" accept=".json,application/json" multiple onchange="exportBatchCsv(event)">
-    <p class="footnote">학생들이 보낸 과제제출.json 파일들을 한꺼번에 선택하면, 글 답변을 모은 표(CSV)를 만들어줍니다. (이미지·링크는 표에 포함되지 않습니다)</p>
+    <input type="file" id="batchFile" class="filein" accept=".html,.htm,.json,text/html,application/json" multiple onchange="exportBatchCsv(event)">
+    <p class="footnote">학생들이 보낸 과제제출 파일(.html)들을 한꺼번에 선택하면, 글 답변을 모은 표(CSV)를 만들어줍니다. (이미지·링크는 표에 포함되지 않습니다)</p>
   </div>
 </div>
 
@@ -255,13 +255,23 @@ function insertPhrase(i){
   toast("문구를 삽입했습니다.");
 }
 
+/* ── 제출파일에서 데이터 꺼내기 (.html 자체완결형 또는 .json 모두 지원) ── */
+function extractSubmission(text){
+  const t=(text||'').trim();
+  if(t.charAt(0)==='{'){ try{return JSON.parse(t);}catch(e){} }
+  const m=text.match(/<script[^>]*id="__submission_data__"[^>]*>([\s\S]*?)<\/script>/i);
+  if(m){ try{return JSON.parse(m[1]);}catch(e){} }
+  return null;
+}
+
 /* ── 제출파일 열기 ── */
 function loadSub(ev){
   const f=ev.target.files[0]; if(!f) return;
   const r=new FileReader();
   r.onload=()=>{
     try{
-      const j=JSON.parse(r.result);
+      const j=extractSubmission(r.result);
+      if(!j) throw "과제제출 파일이 아니거나 손상되었습니다. 학생이 '제출(공유)'로 보낸 .html(또는 .json) 파일을 열어주세요.";
       if(!j.__submission&&!j.__grading){
         if(j.__work) throw "이 파일은 학생의 '작업중'(미제출) 파일입니다. 학생이 '제출(공유)'로 보낸 '과제제출.json' 파일을 받아서 열어주세요.";
         if(j.__autosave) throw "이 파일은 학생 브라우저의 자동저장 파일입니다. 제출용 파일이 아닙니다.";
@@ -388,8 +398,8 @@ async function exportBatchCsv(ev){
   for(const f of files){
     try{
       const text=await f.text();
-      const j=JSON.parse(text);
-      if((!j.__submission&&!j.__grading)||!j.form||!j.data){bad++;continue;}
+      const j=extractSubmission(text);
+      if(!j||(!j.__submission&&!j.__grading)||!j.form||!j.data){bad++;continue;}
       if(!formRef) formRef=j.form;
       rows.push(j.data);
     }catch(e){bad++;}
