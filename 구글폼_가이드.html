@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2f6df0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<title>구글 폼으로 제출받기 - 설정 가이드</title>
+<style>
+:root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--warn:#e8730c;--ok:#1f9d57;--paper:#fff;--soft:#eef3ff;}
+*{box-sizing:border-box;}
+body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7;}
+.wrap{max-width:780px;margin:0 auto;padding:30px 18px 70px;}
+.top{margin-bottom:24px;}
+.top a{font-size:13px;color:var(--sub);text-decoration:none;}
+.top a:hover{color:var(--brand);}
+h1{font-size:24px;margin:14px 0 6px;letter-spacing:-.4px;}
+p.lead{color:var(--sub);margin:0 0 26px;font-size:14.5px;}
+.section{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:22px 22px 18px;margin-bottom:18px;}
+.section h2{font-size:17px;margin:0 0 12px;letter-spacing:-.3px;}
+.steps{counter-reset:s;margin:0;padding:0;list-style:none;}
+.steps li{counter-increment:s;position:relative;padding:6px 0 14px 38px;font-size:14px;}
+.steps li::before{content:counter(s);position:absolute;left:0;top:5px;width:25px;height:25px;background:var(--soft);color:var(--brand-d);border-radius:50%;font-weight:800;font-size:12.5px;display:grid;place-items:center;}
+.steps li b{display:block;margin-bottom:2px;}
+.steps li .sub{font-size:12.5px;color:var(--sub);}
+.note{font-size:12.5px;background:#f7f9fc;border-left:3px solid #c9d6ec;padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px;}
+.warn{font-size:12.5px;background:#fff8e8;border-left:3px solid #f0c869;padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px;color:#8a6d1a;}
+.good{font-size:12.5px;background:#eef7f0;border-left:3px solid #7fc99a;padding:9px 12px;border-radius:0 8px 8px 0;margin-top:10px;color:#1c6b40;}
+.faq dt{font-weight:700;font-size:13.5px;margin-top:12px;}
+.faq dd{margin:4px 0 0;font-size:13px;color:var(--sub);}
+code{background:#f2f5fa;border-radius:5px;padding:1px 6px;font-size:12.5px;}
+.copybox{background:#f7f9fc;border:1px dashed #c9d6ec;border-radius:9px;padding:10px 13px;font-size:13px;margin-top:8px;line-height:1.8;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="가이드.html">← 사용 설명서로 돌아가기</a></div>
+  <h1>📝 구글 폼으로 제출받기 — 설정 가이드</h1>
+  <p class="lead">학생이 파일을 직접 보내는 대신 익숙한 <b>구글 폼</b>에 올리게 하는 방법입니다.
+    한 번 만들어 두면 제출 파일이 선생님 <b>드라이브에 학생별로 자동 정리</b>되고, 폼 응답 시트에서 제출 현황을 한눈에 볼 수 있습니다.</p>
+
+  <div class="section">
+    <h2>① 구글 폼 만들기 (약 3분)</h2>
+    <ol class="steps">
+      <li><b>구글 폼 접속</b><span class="sub"><a href="https://forms.google.com" target="_blank" rel="noopener">forms.google.com</a>에 학교(또는 개인) 구글 계정으로 로그인 → <b>새 양식(＋)</b> 클릭.</span></li>
+      <li><b>폼 제목 정하기</b><span class="sub">예: <code>실습Ⅱ-1-01 과제 제출</code> — 과제 이름과 같게 하면 관리가 편합니다. 학기 내내 하나의 폼으로 모든 과제를 받으려면 <code>○○과목 과제 제출함</code>처럼 만들어도 됩니다.</span></li>
+      <li><b>"파일 업로드" 문항 추가</b><span class="sub">문항 추가(＋) → 문항 유형을 <b>파일 업로드</b>로 변경 → "계속" 확인. 문항 제목은 <code>과제제출 파일(.html)을 올려주세요</code>로 적으세요.</span></li>
+      <li><b>파일 업로드 세부 설정</b><span class="sub">· 특정 파일 형식만 허용: <b>끔</b>(또는 켠다면 유형에 제한 없음)<br>· 최대 파일 수: <b>1</b> &nbsp; · 최대 파일 크기: <b>10MB</b> (사진 많은 과제면 100MB)<br>· 문항을 <b>필수</b>로 설정 ✔</span></li>
+      <li><b>(추천) 학반·번호·이름 문항 추가</b><span class="sub">단답형 문항으로 <code>학반</code>, <code>번호</code>, <code>이름</code>을 추가해두면, 파일을 열지 않아도 폼 응답만으로 누가 냈는지 바로 확인됩니다.</span></li>
+    </ol>
+    <div class="copybox">📋 <b>파일 업로드 문항에 이렇게 안내 문구를 적어두면 좋아요:</b><br>
+      "제출 도구에서 <b>[제출(구글 폼)]</b> 버튼을 누르면 <b>과제제출.html</b> 파일이 저장됩니다.<br>
+      그 파일을 여기에 올려주세요. 보통 <b>다운로드 폴더</b>에 있습니다. 파일은 1개만!"</div>
+  </div>
+
+  <div class="section">
+    <h2>② 과제 양식에 폼 연결하기 (약 1분)</h2>
+    <ol class="steps">
+      <li><b>폼 링크 복사</b><span class="sub">폼 오른쪽 위 <b>보내기</b> → 🔗(링크) 탭 → "URL 단축" 체크 → <b>복사</b>.</span></li>
+      <li><b>양식 만들기 도구에 붙여넣기</b><span class="sub"><a href="과제양식_만들기도구.html">양식 만들기 도구</a>의 <b>"제출받을 구글 폼 링크"</b> 칸에 붙여넣고 양식을 저장하세요.</span></li>
+      <li><b>끝!</b><span class="sub">이 양식으로 과제를 하는 학생은 제출 버튼이 <b>"제출(구글 폼)"</b>으로 표시되고, 누르면 파일 저장 → 폼이 자동으로 열립니다.</span></li>
+    </ol>
+    <div class="good">✅ 폼 링크를 넣지 않은 양식은 기존처럼 공유·파일 전달 방식으로 제출됩니다. 과제마다 골라 쓸 수 있어요.</div>
+  </div>
+
+  <div class="section">
+    <h2>③ 제출 확인하고 채점하기</h2>
+    <ol class="steps">
+      <li><b>제출 현황 확인</b><span class="sub">폼의 <b>응답</b> 탭에서 누가 제출했는지 확인. 응답을 <b>시트로 연결</b>해두면 표로 볼 수 있습니다.</span></li>
+      <li><b>제출 파일 받기</b><span class="sub">파일은 내 드라이브의 <b>폼 이름 폴더 → "파일 응답" 폴더</b>에 자동으로 모입니다. 파일명 뒤에 제출자 계정 이름이 자동으로 붙습니다.</span></li>
+      <li><b>채점</b><span class="sub">드라이브에서 파일을 내려받아 <a href="과제채점_도구_교사용.html">채점 도구</a>로 열면 됩니다. 여러 명을 한 번에 받으려면 폴더에서 전체 선택 → 다운로드(zip) → 풀어서 채점 도구의 "CSV로 내보내기"에 한꺼번에 선택할 수도 있습니다.</span></li>
+    </ol>
+  </div>
+
+  <div class="section">
+    <h2>④ 자주 겪는 문제</h2>
+    <dl class="faq">
+      <dt>학생이 폼에 접속하면 "권한이 필요합니다"라고 나와요.</dt>
+      <dd>파일 업로드 문항이 있는 폼은 <b>구글 로그인</b>이 필요합니다. 학교 계정(Workspace) 폼이라면 설정 ⚙ → 응답 → <b>"조직 외 사용자 응답 허용"</b> 여부를 확인하세요. 학생이 학교 계정이 있다면 그 계정으로 로그인하게 하는 것이 가장 깔끔합니다.</dd>
+      <dt>학생이 어떤 파일을 올려야 하는지 헷갈려해요.</dt>
+      <dd>제출 도구가 저장하는 파일은 <code>과제제목_학번_이름.과제제출.html</code> 형식입니다. 폼 안내 문구에 "다운로드 폴더에서 <b>.과제제출.html</b>로 끝나는 파일"이라고 적어주세요. 제출 완료 화면에도 같은 안내가 자동으로 표시됩니다.</dd>
+      <dt>학생이 폼 제출을 잊어요.</dt>
+      <dd>제출 도구의 완료 화면이 "① 폼 열기 → ② 파일 선택 → ③ 제출" 3단계를 안내하지만, 수업 중 "폼 제출까지 눌러야 제출 완료"라고 한 번 말해주시면 좋습니다. 폼 응답 탭과 출석부를 대조하면 누락자를 바로 찾을 수 있습니다.</dd>
+      <dt>같은 학생이 두 번 제출했어요.</dt>
+      <dd>드라이브 파일명과 응답 시트의 타임스탬프로 최신 것을 확인하고 그 파일로 채점하면 됩니다. 설정 ⚙에서 "응답 1회로 제한"을 켤 수도 있으나, 수정 제출이 막히므로 권장하지 않습니다.</dd>
+      <dt>휴대폰으로 제출하는 학생은요?</dt>
+      <dd>동일하게 동작합니다. 제출 버튼 → 파일이 휴대폰에 저장 → 폼이 열리면 파일 선택에서 "파일" 앱(안드로이드는 다운로드, 아이폰은 파일 앱)에서 방금 저장된 파일을 고르면 됩니다.</dd>
+    </dl>
+  </div>
+</div>
+<script>
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='127.0.0.1'||location.hostname==='localhost')){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+</script>
+</body>
+</html>
