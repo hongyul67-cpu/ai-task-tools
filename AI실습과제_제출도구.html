@@ -280,22 +280,26 @@ function checkAutosave(){
     const saved=JSON.parse(raw);
     const ageSec=Math.round((Date.now()-saved.ts)/1000);
     const ageStr=ageSec<60?`${ageSec}초 전`:ageSec<3600?`${Math.round(ageSec/60)}분 전`:`${Math.round(ageSec/3600)}시간 전`;
+    // 공용 PC(컴퓨터실)에서 다른 학생 내용을 실수로 복원하지 않도록 작성자 표시
+    const savedName=saved.data&&saved.data.student&&saved.data.student.studentName?saved.data.student.studentName:'';
+    const whoStr=savedName?` — <b>${eh(savedName)}</b> 학생이 작성하던 내용`:'';
     // show restore banner
     document.getElementById('startScreen').classList.add('hidden');
     document.getElementById('formScreen').classList.remove('hidden');
     document.getElementById('actionbar').classList.remove('hidden');
     document.getElementById('resetBtn').classList.remove('hidden');
     document.getElementById('barTitle').textContent=FORM.subject||"실습과제";
+    // renderForm이 끝에서 배너 영역을 비우므로, 렌더 후에 배너를 넣어야 표시된다
+    renderForm(false,true);
     document.getElementById('restoreBanner').innerHTML=`
       <div class="restore-banner">
-        <strong>⚡ 자동저장된 내용이 있습니다</strong> (${ageStr})<br>
-        <span style="font-size:12.5px;color:#666;">이어서 작성하려면 '복원'을, 새로 시작하려면 '새로 시작'을 눌러주세요.</span>
+        <strong>⚡ 자동저장된 내용이 있습니다</strong> (${ageStr})${whoStr}<br>
+        <span style="font-size:12.5px;color:#666;">본인이 작성하던 내용이면 '복원'을, 아니거나 새로 시작하려면 '새로 시작'을 눌러주세요.</span>
         <div class="rbbtns">
           <button class="yes" onclick="restoreAutosave()">✅ 복원하기</button>
           <button class="no" onclick="discardAutosave()">🗑 새로 시작</button>
         </div>
       </div>`;
-    renderForm(false,true);
   }catch(e){renderForm();}
 }
 function restoreAutosave(){
