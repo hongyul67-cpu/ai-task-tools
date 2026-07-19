@@ -14,11 +14,21 @@ body{margin:0;font-family:"Apple SD Gothic Neo","Malgun Gothic","맑은 고딕",
 .top a:hover{color:var(--brand);}
 h1{font-size:24px;margin:14px 0 6px;letter-spacing:-.4px;}
 p.lead{color:var(--sub);margin:0 0 18px;font-size:14px;}
-.editbar{display:flex;gap:8px;margin-bottom:20px;}
+.subjectbar{display:flex;gap:8px;align-items:center;margin-bottom:12px;}
+.subjectbar select{flex:1;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14.5px;font-weight:700;font-family:inherit;background:#fff;color:var(--ink);}
+.subjectbar select:focus{outline:none;border-color:var(--brand);}
+.sbtn{flex:0 0 auto;width:42px;height:42px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:15px;color:var(--sub);}
+.sbtn:hover{background:#f2f5f9;}
+.sbtn.danger{color:var(--danger);border-color:#f0cfcb;}
+.editbar{display:flex;gap:8px;margin-bottom:10px;}
+.filebar{display:flex;gap:8px;margin-bottom:20px;}
 .btn{appearance:none;border:0;border-radius:10px;padding:10px 14px;font-size:13.5px;font-weight:700;cursor:pointer;font-family:inherit;}
 .btn-add{background:var(--ok);color:#fff;flex:1;}
 .btn-edit{background:#eef1f6;color:var(--ink);}
 .btn-edit.active{background:var(--brand);color:#fff;}
+.btn-file{background:#eef1f6;color:var(--ink);flex:1;font-size:12.5px;padding:10px 6px;text-align:center;}
+.btn-file:hover{background:#e6ebf3;}
+.vbanner{background:var(--soft);color:var(--brand-d);border:1px solid #cfe0ff;border-radius:12px;padding:12px 16px;font-size:15px;font-weight:700;margin-bottom:18px;}
 .unit{margin-bottom:14px;background:var(--paper);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
 .unit summary{list-style:none;cursor:pointer;padding:13px 16px;font-size:14.5px;font-weight:800;color:var(--brand-d);background:var(--soft);display:flex;align-items:center;gap:8px;user-select:none;}
 .unit summary::-webkit-details-marker{display:none;}
@@ -44,8 +54,8 @@ p.lead{color:var(--sub);margin:0 0 18px;font-size:14px;}
 .closex{border:0;background:#eef1f6;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:15px;}
 label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:14px 0 5px;}
 label.fl:first-of-type{margin-top:0;}
-input[type=text],select{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;background:#fcfdff;}
-input[type=text]:focus,select:focus{outline:none;border-color:var(--brand);}
+input[type=text],select.modal{width:100%;border:1.5px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14px;font-family:inherit;background:#fcfdff;}
+input[type=text]:focus,select.modal:focus{outline:none;border-color:var(--brand);}
 .seg{display:flex;gap:8px;}
 .seg button{flex:1;border:1.5px solid var(--line);background:#fff;border-radius:9px;padding:9px;font-size:13px;font-weight:700;cursor:pointer;color:var(--sub);}
 .seg button.sel{border-color:var(--brand);color:var(--brand-d);background:var(--soft);}
@@ -61,12 +71,30 @@ input[type=text]:focus,select:focus{outline:none;border-color:var(--brand);}
 <div class="wrap">
   <div class="top"><a href="index.html">← 도구 모음으로 돌아가기</a></div>
   <h1>📋 실습과제 목록</h1>
-  <p class="lead">단원을 눌러 펼치고, 과제를 클릭하면 제출도구가 바로 열립니다.</p>
+  <p class="lead" id="leadText">과목을 선택하고, 과제를 클릭하면 제출도구가 바로 열립니다.</p>
 
-  <div class="editbar">
-    <button class="btn btn-add" onclick="openAdd()">＋ 과제 추가</button>
-    <button class="btn btn-edit" id="editToggle" onclick="toggleEdit()">🗑 삭제 모드</button>
+  <!-- 관리 도구 (일반 모드) -->
+  <div id="manageUI">
+    <div class="subjectbar">
+      <select id="subjectSel" onchange="switchSubject(this.value)"></select>
+      <button class="sbtn" title="과목 추가" onclick="addSubject()">＋</button>
+      <button class="sbtn" title="과목 이름 변경" onclick="renameSubject()">✎</button>
+      <button class="sbtn danger" title="과목 삭제" onclick="deleteSubject()">🗑</button>
+    </div>
+    <div class="editbar">
+      <button class="btn btn-add" onclick="openAdd()">＋ 과제 추가</button>
+      <button class="btn btn-edit" id="editToggle" onclick="toggleEdit()">🗑 삭제 모드</button>
+    </div>
+    <div class="filebar">
+      <button class="btn btn-file" onclick="exportList()">📤 목록 저장</button>
+      <button class="btn btn-file" onclick="document.getElementById('importFile').click()">📥 불러오기</button>
+      <button class="btn btn-file" onclick="makeStudentLink()">🔗 학생용 링크</button>
+      <input type="file" id="importFile" class="filein" accept=".json,application/json" onchange="importList(event)">
+    </div>
   </div>
+
+  <!-- 학생 보기 모드(?list=) 배너 -->
+  <div id="viewBanner"></div>
 
   <div id="unitList"></div>
 </div>
@@ -79,11 +107,11 @@ input[type=text]:focus,select:focus{outline:none;border-color:var(--brand);}
     <div class="sheet-head"><h2>과제 추가</h2><button class="closex" onclick="closeAdd()">✕</button></div>
 
     <label class="fl">단원</label>
-    <input type="text" id="f_unit" placeholder="예: Ⅱ-1. AI와 대화하고 질문 다루기" list="unitOptions">
+    <input type="text" id="f_unit" placeholder="예: 1단원 · 첫 번째 주제" list="unitOptions">
     <datalist id="unitOptions"></datalist>
 
     <label class="fl">과제 제목</label>
-    <input type="text" id="f_title" placeholder="예: 실습Ⅱ-1-06 · 새 실습 과제">
+    <input type="text" id="f_title" placeholder="예: 실습 1-01 · 첫 실습 과제">
 
     <label class="fl">구분</label>
     <div class="seg">
@@ -98,25 +126,31 @@ input[type=text]:focus,select:focus{outline:none;border-color:var(--brand);}
     </div>
 
     <div id="srcUrlBox" style="margin-top:10px;">
-      <input type="text" id="f_path" placeholder="예: assignments/실습Ⅱ-1-06_새과제.json">
+      <input type="text" id="f_path" placeholder="예: assignments/실습1-01_첫과제.json">
       <div class="hint">assignments 폴더에 이미 올려둔 .json 파일의 경로를 입력하세요.</div>
     </div>
     <div id="srcFileBox" style="margin-top:10px;display:none;">
       <button type="button" class="filepick" id="filePickBtn" onclick="document.getElementById('f_file').click()">📂 양식 파일(.json) 선택</button>
       <input type="file" id="f_file" class="filein" accept=".json,application/json" onchange="onPickFile(event)">
-      <div class="hint">이 기기의 브라우저에만 저장됩니다. 다른 기기·브라우저에서는 보이지 않습니다.</div>
+      <div class="hint">이 기기 브라우저에 저장됩니다. 다른 기기와 함께 쓰려면 '목록 저장'으로 내보내면 양식 내용도 파일에 함께 담깁니다.</div>
     </div>
 
-    <button class="btn btn-add" style="margin-top:18px;" onclick="saveItem()">저장</button>
+    <button class="btn btn-add" style="margin-top:18px;width:100%;" onclick="saveItem()">저장</button>
   </div>
 </div>
 
+<script src="common.js"></script>
 <script>
-const STORE_KEY='taskList_v1';
-let editMode=false;
+const STORE_KEY='taskList_v2';
+const OLD_KEY='taskList_v1';
+let editMode=false, viewOnly=false;
 let pickedTag='req', pickedSource='url', pickedFileContent=null, pickedFileName=null;
+let STATE=null;     // 일반 모드 상태 {version,subjects:[{id,name,items:[]}],currentId}
+let VIEWLIST=null;  // ?list= 보기 모드 {name, items}
 
-const DEFAULTS=[
+/* 예시 과목(첫 화면용 · 삭제 가능) */
+const SAMPLE_NAME="인공지능(AI)과 직업생활 (예시)";
+const SAMPLE_ITEMS=[
   {unit:"Ⅱ-1. AI와 대화하고 질문 다루기",title:"실습Ⅱ-1-01 · SenGPT 접속하고 첫 대화 나누기",tag:"req",file:"assignments/실습Ⅱ-1-01_SenGPT_접속하기.json"},
   {unit:"Ⅱ-1. AI와 대화하고 질문 다루기",title:"실습Ⅱ-1-02 · 네 가지 AI에게 같은 질문 던지기",tag:"req",file:"assignments/실습Ⅱ-1-02_네가지AI_비교.json"},
   {unit:"Ⅱ-1. AI와 대화하고 질문 다루기",title:"실습Ⅱ-1-03 · RCIF 공식으로 프롬프트 업그레이드하기",tag:"req",file:"assignments/실습Ⅱ-1-03_RCIF_프롬프트업그레이드.json"},
@@ -132,21 +166,72 @@ const DEFAULTS=[
   {unit:"Ⅱ-4. 멀티턴 대화로 기획서 완성하기",title:"실습Ⅱ-4-01 · [공업계] 공정 개선 기획안 완성하기",tag:"req",file:"assignments/실습Ⅱ-4-01_공업계_공정개선기획안.json"},
   {unit:"Ⅱ-4. 멀티턴 대화로 기획서 완성하기",title:"실습Ⅱ-4-02 · [상업계] 고객 관리 자동화 기획안 완성하기",tag:"req",file:"assignments/실습Ⅱ-4-02_상업계_고객관리기획안.json"},
   {unit:"Ⅱ-4. 멀티턴 대화로 기획서 완성하기",title:"실습Ⅱ-4-03 · 내 기획안, AI에게 비판받기",tag:"opt",file:"assignments/실습Ⅱ-4-03_기획안_AI비판받기.json"}
-].map((d,i)=>({id:'d'+i,...d}));
+];
 
-function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2200);}
+function uid(p){return p+Date.now().toString(36)+Math.random().toString(36).slice(2,6);}
+function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400);}
 
-function loadList(){
+/* ── 상태 로드/저장/마이그레이션 ── */
+function freshSample(){
+  const sub={id:uid('s'),name:SAMPLE_NAME,items:SAMPLE_ITEMS.map(d=>({id:uid('i'),...d}))};
+  return {version:2,subjects:[sub],currentId:sub.id};
+}
+function migrate(){
+  try{
+    const oldRaw=localStorage.getItem(OLD_KEY);
+    if(oldRaw){
+      const arr=JSON.parse(oldRaw);
+      if(Array.isArray(arr)&&arr.length){
+        const sub={id:uid('s'),name:SAMPLE_NAME,items:arr.map(x=>({id:x.id||uid('i'),unit:x.unit,title:x.title,tag:x.tag,file:x.file}))};
+        return {version:2,subjects:[sub],currentId:sub.id};
+      }
+    }
+  }catch(e){}
+  return freshSample();
+}
+function loadState(){
   try{
     const raw=localStorage.getItem(STORE_KEY);
-    if(!raw){ saveList(DEFAULTS); return DEFAULTS.slice(); }
-    const arr=JSON.parse(raw);
-    if(!Array.isArray(arr)) throw 0;
-    return arr;
-  }catch(e){ return DEFAULTS.slice(); }
+    if(!raw){ const st=migrate(); saveState(st); return st; }
+    const st=JSON.parse(raw);
+    if(!st||!Array.isArray(st.subjects)||!st.subjects.length) throw 0;
+    if(!st.currentId||!st.subjects.some(s=>s.id===st.currentId)) st.currentId=st.subjects[0].id;
+    return st;
+  }catch(e){ const st=freshSample(); saveState(st); return st; }
 }
-function saveList(arr){ localStorage.setItem(STORE_KEY, JSON.stringify(arr)); }
+function saveState(st){ try{localStorage.setItem(STORE_KEY,JSON.stringify(st));}catch(e){toast("저장 공간이 부족합니다. 사진이 많은 양식은 저장소 경로 방식을 권장합니다.");} }
+function currentSubject(){ return STATE.subjects.find(s=>s.id===STATE.currentId)||STATE.subjects[0]; }
 
+/* ── 과목 관리 ── */
+function renderSubjectSel(){
+  const sel=document.getElementById('subjectSel');
+  sel.innerHTML=STATE.subjects.map(s=>`<option value="${ea(s.id)}" ${s.id===STATE.currentId?'selected':''}>${eh(s.name)} (${s.items.length})</option>`).join('');
+}
+function switchSubject(id){ STATE.currentId=id; saveState(STATE); render(); }
+function addSubject(){
+  const name=(prompt("새 과목 이름을 입력하세요.","")||"").trim();
+  if(!name) return;
+  const sub={id:uid('s'),name,items:[]};
+  STATE.subjects.push(sub); STATE.currentId=sub.id; saveState(STATE); render();
+  toast("과목을 추가했습니다. '과제 추가'로 과제를 넣어보세요.");
+}
+function renameSubject(){
+  const sub=currentSubject();
+  const name=(prompt("과목 이름을 바꿉니다.",sub.name)||"").trim();
+  if(!name) return;
+  sub.name=name; saveState(STATE); render(); toast("과목 이름을 바꿨습니다.");
+}
+function deleteSubject(){
+  if(STATE.subjects.length<=1){ toast("마지막 과목은 삭제할 수 없습니다."); return; }
+  const sub=currentSubject();
+  if(!confirm(`'${sub.name}' 과목과 그 안의 과제 목록을 삭제할까요?\n(이 기기에서만 사라집니다)`)) return;
+  sub.items.forEach(it=>{ if(it.file&&it.file.startsWith('local:')) localStorage.removeItem('localform_'+it.file.slice(6)); });
+  STATE.subjects=STATE.subjects.filter(s=>s.id!==sub.id);
+  STATE.currentId=STATE.subjects[0].id;
+  saveState(STATE); render(); toast("과목을 삭제했습니다.");
+}
+
+/* ── 편집 ── */
 function toggleEdit(){
   editMode=!editMode;
   document.getElementById('editToggle').classList.toggle('active',editMode);
@@ -154,20 +239,26 @@ function toggleEdit(){
   render();
 }
 
+/* ── 렌더 ── */
+function getItems(){ return viewOnly ? (VIEWLIST.items||[]) : currentSubject().items; }
 function render(){
-  const list=loadList();
+  const box=document.getElementById('unitList');
+  if(viewOnly){
+    document.getElementById('manageUI').style.display='none';
+    document.getElementById('viewBanner').innerHTML=`<div class="vbanner">📚 ${eh(VIEWLIST.name||'과제 목록')}</div>`;
+  }else{
+    renderSubjectSel();
+  }
+  const list=getItems();
+  if(!list.length){ box.innerHTML='<div class="empty">'+(viewOnly?'등록된 과제가 없습니다.':'등록된 과제가 없습니다. "과제 추가"로 등록해보세요.')+'</div>'; return; }
   const units=[];
   list.forEach(it=>{ if(!units.includes(it.unit)) units.push(it.unit); });
-
-  const box=document.getElementById('unitList');
-  if(!list.length){ box.innerHTML='<div class="empty">등록된 과제가 없습니다. "과제 추가"로 등록해보세요.</div>'; return; }
-
   box.innerHTML = units.map((u,ui)=>{
     const items=list.filter(it=>it.unit===u);
     const itemsHtml = items.map(it=>{
       const href = `AI실습과제_제출도구.html?form=${encodeURIComponent(it.file)}`;
       const badge = it.tag==='opt' ? '<span class="badge opt">선택·심화</span>' : '<span class="badge req">필수</span>';
-      const del = editMode ? `<button class="delbtn" onclick="delItem('${it.id}')" title="삭제">✕</button>` : '';
+      const del = (!viewOnly&&editMode) ? `<button class="delbtn" onclick="delItem('${it.id}')" title="삭제">✕</button>` : '';
       return `<div class="item">
         <a href="${href}">
           <div class="name">${eh(it.title)}</div>
@@ -185,13 +276,71 @@ function render(){
 
 function delItem(id){
   if(!confirm('이 과제를 목록에서 삭제할까요? (이 기기에서만 사라지며, 원본 파일은 지워지지 않습니다)')) return;
-  let list=loadList();
-  const removed=list.find(x=>x.id===id);
-  list=list.filter(x=>x.id!==id);
-  saveList(list);
+  const sub=currentSubject();
+  const removed=sub.items.find(x=>x.id===id);
+  sub.items=sub.items.filter(x=>x.id!==id);
+  saveState(STATE);
   if(removed && removed.file && removed.file.startsWith('local:')) localStorage.removeItem('localform_'+removed.file.slice(6));
   render();
   toast('삭제했습니다.');
+}
+
+/* ── 목록 저장(내보내기) ── */
+function exportList(){
+  const sub=currentSubject();
+  if(!sub.items.length){ toast("이 과목에 과제가 없습니다."); return; }
+  const forms={};
+  sub.items.forEach(it=>{
+    if(it.file&&it.file.startsWith('local:')){
+      const k=it.file.slice(6); const c=localStorage.getItem('localform_'+k);
+      if(c) forms[k]=c;
+    }
+  });
+  const out={__tasklist:true,formatVersion:"1.0",name:sub.name,
+    items:sub.items.map(it=>({unit:it.unit,title:it.title,tag:it.tag,file:it.file})),forms};
+  const blob=new Blob([JSON.stringify(out,null,2)],{type:"application/json"});
+  const safe=(sub.name||'과목').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,40);
+  saveFileSmart(blob,`과제목록_${safe}.json`);
+  toast("목록 파일을 저장했습니다. 다른 기기에서 '불러오기'로 열거나, 저장소에 올려 학생용 링크로 배포하세요.");
+}
+
+/* ── 목록 불러오기(가져오기) ── */
+function importList(ev){
+  const f=ev.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const j=JSON.parse(r.result);
+      if(!j.__tasklist||!Array.isArray(j.items)){
+        if(j.tasks) throw "이 파일은 '과제 양식' 파일입니다. 목록 파일이 아닙니다.";
+        throw "과제목록 파일이 아니거나 형식이 맞지 않습니다.";
+      }
+      const map={};
+      if(j.forms) Object.entries(j.forms).forEach(([k,c])=>{ const nk=uid('lf'); try{localStorage.setItem('localform_'+nk,c);}catch(e){} map[k]=nk; });
+      const items=(j.items||[]).map(it=>{
+        let file=it.file;
+        if(file&&file.startsWith('local:')){ const k=file.slice(6); if(map[k]) file='local:'+map[k]; }
+        return {id:uid('i'),unit:it.unit||'기타',title:it.title||'제목 없음',tag:it.tag==='opt'?'opt':'req',file};
+      });
+      const sub={id:uid('s'),name:(j.name||'불러온 과목'),items};
+      STATE.subjects.push(sub); STATE.currentId=sub.id; saveState(STATE); render();
+      toast(`'${sub.name}' 과목을 불러왔습니다.`);
+    }catch(e){ toast(typeof e==='string'?e:"과제목록 파일이 아니거나 손상되었습니다."); }
+  };
+  r.readAsText(f); ev.target.value="";
+}
+
+/* ── 학생용 링크 만들기 ── */
+function makeStudentLink(){
+  const sub=currentSubject();
+  const safe=(sub.name||'과목').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,40);
+  const suggested='assignments/과제목록_'+safe+'.json';
+  const path=(prompt("학생에게 배포할 목록 파일의 저장소 경로를 입력하세요.\n먼저 '목록 저장'으로 받은 파일을 저장소의 이 경로에 올려두세요.",suggested)||"").trim();
+  if(!path) return;
+  const link=location.origin+location.pathname+'?list='+encodeURIComponent(path);
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(link).then(()=>toast("학생용 링크를 복사했습니다. 이 링크를 열면 이 과목 목록만 보입니다."),()=>prompt("아래 링크를 복사하세요:",link));
+  }else{ prompt("아래 링크를 복사하세요:",link); }
 }
 
 /* ── 추가 모달 ── */
@@ -203,7 +352,7 @@ function openAdd(){
   document.getElementById('filePickBtn').textContent='📂 양식 파일(.json) 선택';
   document.getElementById('filePickBtn').classList.remove('ok');
   pickTag('req'); pickSource('url');
-  const units=[...new Set(loadList().map(x=>x.unit))];
+  const units=[...new Set(currentSubject().items.map(x=>x.unit))];
   document.getElementById('unitOptions').innerHTML = units.map(u=>`<option value="${ea(u)}"></option>`).join('');
   document.getElementById('overlay').classList.add('show');
 }
@@ -239,7 +388,6 @@ function saveItem(){
   const title=document.getElementById('f_title').value.trim();
   if(!unit){ toast('단원을 입력하세요.'); return; }
   if(!title){ toast('과제 제목을 입력하세요.'); return; }
-
   let file;
   if(pickedSource==='url'){
     const path=document.getElementById('f_path').value.trim();
@@ -247,23 +395,40 @@ function saveItem(){
     file=path;
   }else{
     if(!pickedFileContent){ toast('양식 파일을 선택하세요.'); return; }
-    const key=Date.now().toString(36)+Math.random().toString(36).slice(2,7);
-    localStorage.setItem('localform_'+key, pickedFileContent);
+    const key=uid('lf');
+    try{ localStorage.setItem('localform_'+key, pickedFileContent); }catch(e){ toast('저장 공간이 부족합니다.'); return; }
     file='local:'+key;
   }
-
-  const list=loadList();
-  list.push({id:'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,5), unit, title, tag:pickedTag, file});
-  saveList(list);
-  closeAdd();
-  render();
+  currentSubject().items.push({id:uid('i'), unit, title, tag:pickedTag, file});
+  saveState(STATE);
+  closeAdd(); render();
   toast('과제를 추가했습니다.');
 }
 
 function eh(s){return String(s==null?'':s).replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));}
 function ea(s){return String(s==null?'':s).replace(/"/g,'&quot;');}
 
-render();
+/* ── 시작 ── */
+function init(){
+  const listPath=new URLSearchParams(location.search).get('list');
+  if(listPath){
+    viewOnly=true;
+    document.getElementById('leadText').textContent='과제를 클릭하면 제출도구가 바로 열립니다.';
+    fetch(listPath).then(r=>{ if(!r.ok) throw 0; return r.json(); }).then(j=>{
+      if(!j.__tasklist||!Array.isArray(j.items)) throw 0;
+      if(j.forms) Object.entries(j.forms).forEach(([k,c])=>{ try{localStorage.setItem('localform_'+k,c);}catch(e){} });
+      VIEWLIST={name:j.name,items:j.items};
+      render();
+    }).catch(()=>{
+      document.getElementById('manageUI').style.display='none';
+      document.getElementById('unitList').innerHTML='<div class="empty">목록을 불러올 수 없습니다. 링크를 확인하거나 선생님께 문의하세요.</div>';
+    });
+    return;
+  }
+  STATE=loadState();
+  render();
+}
+init();
 </script>
 </body>
 </html>
