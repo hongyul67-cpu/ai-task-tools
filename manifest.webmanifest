@@ -1,0 +1,13 @@
+{
+  "name": "실습과제 도구 모음",
+  "short_name": "실습과제",
+  "description": "과제 양식 만들기 · 학생 제출 · 채점·피드백 도구 모음",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f4f6fa",
+  "theme_color": "#2f6df0",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
