@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2f6df0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
 <title>사용 설명서 - 실습과제 도구</title>
 <style>
 :root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--warn:#e8730c;--ok:#1f9d57;--paper:#fff;--soft:#eef3ff;}
@@ -134,7 +137,7 @@ p.lead{color:var(--sub);margin:0 0 26px;font-size:14.5px;}
     <h2>❓ 자주 묻는 질문</h2>
     <dl class="faq">
       <dt>인터넷이 없어도 쓸 수 있나요?</dt>
-      <dd>페이지를 한 번 열면 그 다음부터는 인터넷 연결 없이도 작동합니다(단, 처음 접속할 때는 필요).</dd>
+      <dd>페이지를 한 번 열면 필요한 파일이 기기에 저장되어, 그 다음부터는 인터넷 연결 없이도 작동합니다(처음 접속할 때만 필요). 브라우저 메뉴의 "앱 설치"/"홈 화면에 추가"를 누르면 앱처럼 아이콘으로 바로 열 수 있습니다.</dd>
       <dt>학생 답변이 외부 서버로 전송되나요?</dt>
       <dd>아니요. 모든 데이터는 학생의 브라우저 안에서만 처리되고, 사람이 직접 파일로 내보내 전달하는 방식입니다. 자동으로 어디에도 업로드되지 않습니다.</dd>
       <dt>브라우저를 바꾸거나 기기를 바꾸면 작성한 내용이 사라지나요?</dt>
@@ -146,5 +149,10 @@ p.lead{color:var(--sub);margin:0 0 26px;font-size:14.5px;}
     </dl>
   </div>
 </div>
+<script>
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='127.0.0.1'||location.hostname==='localhost')){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+</script>
 </body>
 </html>

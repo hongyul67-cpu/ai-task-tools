@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2f6df0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
 <title>실습과제 목록</title>
 <style>
 :root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--brand-d:#1f53c4;--paper:#fff;--soft:#eef3ff;--ok:#1f9d57;--warn:#e8730c;--danger:#d6483b;}
@@ -85,6 +88,7 @@ input[type=text]:focus,select.modal:focus{outline:none;border-color:var(--brand)
       <button class="btn btn-add" onclick="openAdd()">＋ 과제 추가</button>
       <button class="btn btn-edit" id="editToggle" onclick="toggleEdit()">🗑 삭제 모드</button>
     </div>
+    <div id="editHint" style="display:none;font-size:11.5px;color:#b3590a;margin:-2px 2px 10px;">🗑 삭제해도 이 기기 화면의 목록에서만 사라집니다. 저장소의 원본 양식 파일은 지워지지 않습니다.</div>
     <div class="filebar">
       <button class="btn btn-file" onclick="exportList()">📤 목록 저장</button>
       <button class="btn btn-file" onclick="document.getElementById('importFile').click()">📥 불러오기</button>
@@ -236,6 +240,7 @@ function toggleEdit(){
   editMode=!editMode;
   document.getElementById('editToggle').classList.toggle('active',editMode);
   document.getElementById('editToggle').textContent = editMode ? '✓ 삭제 모드 끄기' : '🗑 삭제 모드';
+  document.getElementById('editHint').style.display = editMode ? '' : 'none';
   render();
 }
 
@@ -330,13 +335,22 @@ function importList(ev){
   r.readAsText(f); ev.target.value="";
 }
 
-/* ── 학생용 링크 만들기 ── */
-function makeStudentLink(){
+/* ── 학생용 링크 만들기 ──
+   '목록 저장'의 기본 파일명(과제목록_과목명.json)이 assignments/에 올라와 있으면
+   자동으로 찾아 바로 링크를 복사하고, 없으면 경로를 물어본다. */
+async function makeStudentLink(){
   const sub=currentSubject();
   const safe=(sub.name||'과목').replace(/[\\/:*?"<>|\s]+/g,'_').slice(0,40);
   const suggested='assignments/과제목록_'+safe+'.json';
-  const path=(prompt("학생에게 배포할 목록 파일의 저장소 경로를 입력하세요.\n먼저 '목록 저장'으로 받은 파일을 저장소의 이 경로에 올려두세요.",suggested)||"").trim();
-  if(!path) return;
+  let path=null;
+  try{
+    const r=await fetch(suggested,{cache:'no-store'});
+    if(r.ok){ const j=await r.json(); if(j&&j.__tasklist) path=suggested; }
+  }catch(e){}
+  if(!path){
+    path=(prompt("저장소에서 '"+suggested+"' 파일을 찾지 못했습니다.\n먼저 '목록 저장'으로 받은 파일을 저장소 assignments 폴더에 올린 뒤,\n올린 경로를 입력하세요.",suggested)||"").trim();
+    if(!path) return;
+  }
   const link=location.origin+location.pathname+'?list='+encodeURIComponent(path);
   if(navigator.clipboard&&navigator.clipboard.writeText){
     navigator.clipboard.writeText(link).then(()=>toast("학생용 링크를 복사했습니다. 이 링크를 열면 이 과목 목록만 보입니다."),()=>prompt("아래 링크를 복사하세요:",link));

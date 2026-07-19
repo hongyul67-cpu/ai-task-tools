@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#2f6df0">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
 <title>실습과제 도구 모음</title>
 <style>
 :root{--ink:#1b2330;--sub:#5b6675;--line:#e2e6ec;--bg:#f4f6fa;--brand:#2f6df0;--paper:#fff;}
@@ -55,5 +58,10 @@ p.lead{color:var(--sub);margin:0 0 28px;}
     <p>전체 흐름과 단계별 사용법을 한 페이지로 정리한 가이드입니다.</p>
   </a>
 </div>
+<script>
+if('serviceWorker' in navigator && (location.protocol==='https:'||location.hostname==='127.0.0.1'||location.hostname==='localhost')){
+  window.addEventListener('load',()=>{ navigator.serviceWorker.register('sw.js').catch(()=>{}); });
+}
+</script>
 </body>
 </html>
