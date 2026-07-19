@@ -1,12 +1,13 @@
 // 서비스워커: 앱 셸과 PDF 라이브러리를 캐시해 오프라인·CDN 차단 상황에서도 동작하게 한다.
 // 같은 출처 파일은 네트워크 우선(항상 최신) + 오프라인일 때 캐시 대체,
 // CDN 라이브러리는 캐시 우선(버전 고정이라 갱신 불필요).
-const CACHE='attools-v1';
+const CACHE='attools-v2';
 const PRECACHE=[
   'index.html',
   'common.js',
   'manifest.webmanifest',
   '가이드.html',
+  '구글폼_가이드.html',
   '과제목록.html',
   'AI실습과제_제출도구.html',
   '과제양식_만들기도구.html',
