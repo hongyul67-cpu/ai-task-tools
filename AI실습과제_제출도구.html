@@ -161,7 +161,7 @@ label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:
   <div class="inner">
     <button class="btn btn-ghost small" style="flex:0 0 auto;padding:11px 12px;" onclick="saveWork()" title="진행 상태만 저장 (제출 아님)">💾 작업저장</button>
     <button class="btn btn-ghost" onclick="openPreview()">👁 미리보기</button>
-    <button class="btn btn-ok" onclick="submitHtml(true)">📤 제출(공유)</button>
+    <button class="btn btn-ok" id="submitBtn" onclick="submitHtml(true)">📤 제출(공유)</button>
   </div>
 </div>
 
@@ -179,7 +179,7 @@ label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:
     <div style="display:flex;gap:9px;margin-top:14px;">
       <button class="btn btn-ghost" onclick="closePv()">돌아가기</button>
       <button class="btn btn-warn" onclick="closePv();makePdf(false)">📄 PDF 저장(선택)</button>
-      <button class="btn btn-ok" onclick="closePv();submitHtml(true)">📤 제출(공유)</button>
+      <button class="btn btn-ok" id="pvSubmitBtn" onclick="closePv();submitHtml(true)">📤 제출(공유)</button>
     </div>
   </div>
 </div>
@@ -392,6 +392,10 @@ function renderForm(restore,noscroll){
   });
   updateProgress();
   startAutoSave();
+  // 구글 폼 제출 양식이면 버튼 라벨로 알려준다
+  const gLabel=(FORM.submitUrl&&/^https:\/\//.test(FORM.submitUrl))?'📤 제출(구글 폼)':'📤 제출(공유)';
+  const sb=document.getElementById('submitBtn'); if(sb) sb.textContent=gLabel;
+  const pb=document.getElementById('pvSubmitBtn'); if(pb) pb.textContent=gLabel;
   if(!noscroll) window.scrollTo(0,0);
   document.getElementById('restoreBanner').innerHTML="";
 }
@@ -551,7 +555,9 @@ async function submitHtml(share){
   const html=buildSubmissionHtml();
   const fname=wfname()+".과제제출.html";
   const blob=new Blob([html],{type:"text/html"});
-  if(share && navigator.canShare){
+  // 양식에 구글 폼 링크가 있으면: 파일 저장 → 폼 열어 업로드 안내 (공유 시트 대신)
+  const gform=FORM.submitUrl&&/^https:\/\//.test(FORM.submitUrl)?FORM.submitUrl:null;
+  if(share && !gform && navigator.canShare){
     const file=new File([blob],fname,{type:'text/html'});
     if(navigator.canShare({files:[file]})){
       try{ await navigator.share({files:[file],title:FORM.assignmentTitle,text:'실습과제 제출'}); showSubmitDone(fname,'share'); return; }
@@ -560,7 +566,7 @@ async function submitHtml(share){
   }
   const r=await saveFileSmart(blob,fname);
   if(r.cancelled) return;
-  showSubmitDone(fname,'save');
+  showSubmitDone(fname, gform?'gform':'save');
 }
 
 function buildSubmissionHtml(){
@@ -611,21 +617,37 @@ function buildSubmissionHtml(){
     +'</body></html>';
 }
 
-/* ── 제출 완료 안내 (파일 1개) ── */
+/* ── 제출 완료 안내 (파일 1개 / 구글 폼) ── */
 function showSubmitDone(fname,mode){
-  const lead = mode==='share'
-    ? "방금 연 <b>공유 창</b>에서 이 파일을 선생님께 보내면 제출 끝이에요."
-    : "제출 파일이 저장됐어요. 이 <b>파일 하나만</b> 선생님께 보내면 됩니다.";
-  document.getElementById('doneBody').innerHTML=`
-    <p class="muted" style="margin:0 0 12px;">${lead}</p>
+  const fileCard=`
     <div style="display:flex;gap:10px;align-items:center;border:1px solid #c4e3cf;border-radius:10px;padding:12px 13px;background:#f0fbf4;">
       <span style="font-size:20px;">📄</span>
       <div style="flex:1;min-width:0;">
         <div style="font-weight:800;font-size:13.5px;color:#177a44;">제출 파일 (1개)</div>
         <div class="muted" style="font-size:12px;word-break:break-all;">${eh(fname)}</div>
       </div>
-    </div>
-    <p class="muted" style="font-size:12px;margin:10px 0 0;">이 파일 하나에 답안과 채점용 정보가 모두 담겨 있어, <b>이것만</b> 보내면 됩니다. 파일을 더블클릭하면 내 답안을 그대로 볼 수도 있어요.</p>`;
+    </div>`;
+  let html;
+  if(mode==='gform'){
+    html=`
+      <p class="muted" style="margin:0 0 12px;">제출 파일이 <b>저장</b>됐어요. 이제 <b>구글 폼</b>에 이 파일을 올리면 제출 끝!</p>
+      ${fileCard}
+      <ol class="steps" style="margin-top:12px;">
+        <li>아래 버튼으로 구글 폼 열기</li>
+        <li>폼의 <b>파일 업로드</b> 칸에서 방금 저장한 파일 선택<br><span class="muted" style="font-size:12px;">(보통 <b>다운로드</b> 폴더에 있어요)</span></li>
+        <li>폼의 <b>제출</b> 버튼 누르기</li>
+      </ol>
+      <a class="btn btn-ok" style="display:block;text-align:center;text-decoration:none;margin-top:6px;" href="${ea(FORM.submitUrl)}" target="_blank" rel="noopener">📝 구글 폼 열어서 제출하기</a>`;
+  }else{
+    const lead = mode==='share'
+      ? "방금 연 <b>공유 창</b>에서 이 파일을 선생님께 보내면 제출 끝이에요."
+      : "제출 파일이 저장됐어요. 이 <b>파일 하나만</b> 선생님께 보내면 됩니다.";
+    html=`
+      <p class="muted" style="margin:0 0 12px;">${lead}</p>
+      ${fileCard}
+      <p class="muted" style="font-size:12px;margin:10px 0 0;">이 파일 하나에 답안과 채점용 정보가 모두 담겨 있어, <b>이것만</b> 보내면 됩니다. 파일을 더블클릭하면 내 답안을 그대로 볼 수도 있어요.</p>`;
+  }
+  document.getElementById('doneBody').innerHTML=html;
   document.getElementById('doneOverlay').classList.add('show');
 }
 function closeDone(){document.getElementById('doneOverlay').classList.remove('show');}
