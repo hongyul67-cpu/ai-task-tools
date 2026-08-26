@@ -92,6 +92,17 @@ label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:
 .sheet-head{display:flex;align-items:center;margin-bottom:14px;}
 .sheet-head h2{margin:0;flex:1;font-size:17px;}
 .sheet-close{border:0;background:#eef1f6;border-radius:8px;width:32px;height:32px;cursor:pointer;font-size:15px;}
+.privacy-box{background:#f7f9fc;border:1px solid #e2e6ec;border-radius:10px;padding:13px 15px;font-size:13px;line-height:1.7;}
+.privacy-box h4{margin:0 0 8px;font-size:13.5px;color:#1f53c4;}
+.privacy-box dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 12px;}
+.privacy-box dt{font-weight:800;color:#5b6675;white-space:nowrap;}
+.privacy-box dd{margin:0;}
+.privacy-note{font-size:11.5px;color:#8a6d1a;background:#fff8e8;border-left:3px solid #f0c869;padding:8px 11px;border-radius:0 8px 8px 0;margin-top:10px;}
+.consent-check{display:flex;gap:9px;align-items:flex-start;margin-top:14px;padding:12px 13px;border:1.5px solid #cfe0ff;border-radius:10px;background:#f8faff;cursor:pointer;font-size:13.5px;line-height:1.5;}
+.consent-check input{margin-top:2px;width:18px;height:18px;flex:0 0 auto;cursor:pointer;}
+.consent-btns{display:flex;gap:9px;margin-top:14px;}
+.consent-btns .btn{flex:1;}
+.consent-btns .btn:disabled{opacity:.45;cursor:not-allowed;}
 .pv-block{border:1px solid var(--line);border-radius:10px;padding:12px;margin-bottom:10px;}
 .pv-title{font-weight:800;font-size:14px;margin-bottom:4px;}
 .pv-text{font-size:13px;background:#f7f9fc;border-radius:8px;padding:9px;white-space:pre-wrap;color:#333;}
@@ -187,6 +198,23 @@ label.fl{display:block;font-size:12.5px;font-weight:700;color:var(--sub);margin:
 </div>
 
 <!-- 제출 완료 안내 모달 -->
+<div class="overlay" id="consentOverlay" onclick="if(event.target===this)closeConsent()">
+  <div class="sheet">
+    <div class="sheet-head">
+      <h2>🔒 개인정보 수집·제공 동의</h2>
+      <button class="sheet-close" onclick="closeConsent()">✕</button>
+    </div>
+    <div id="consentBody"></div>
+    <label class="consent-check">
+      <input type="checkbox" id="consentChk" onchange="document.getElementById('consentGo').disabled=!this.checked;">
+      <span>위 내용을 읽고 이해했으며, <b>개인정보 수집·제공에 동의</b>합니다.</span>
+    </label>
+    <div class="consent-btns">
+      <button class="btn btn-ghost" onclick="closeConsent()">취소</button>
+      <button class="btn btn-ok" id="consentGo" disabled onclick="agreeAndSubmit()">동의하고 제출</button>
+    </div>
+  </div>
+</div>
 <div class="overlay" id="doneOverlay" onclick="if(event.target===this)closeDone()">
   <div class="sheet">
     <div class="sheet-head">
@@ -563,6 +591,52 @@ async function makePdf(){
 /* ── 제출: 자체 완결형 HTML 파일 1개 만들기 ──
    답안을 보기 좋게 렌더링하면서, 채점용 원본 데이터를 파일 안에 함께 품는다.
    → 학생은 이 파일 1개만 보내면 되고, PDF 라이브러리(CDN)도 필요 없다. */
+/* ── 개인정보 수집·제공 동의 ──
+   제출은 이름·학번과 답안이 담긴 파일을 선생님께 보내는 행위이므로,
+   실제 전송 전에 무엇이 어디로 가는지 알리고 동의를 받는다. */
+function privacyNoticeHtml(){
+  const items=normalizeStudentFields().map(f=>f.label||f.key).join(', ');
+  const dest = (FORM.uploadUrl&&/^https:\/\/script\.google\.com\//.test(FORM.uploadUrl))
+      ? '담당 선생님의 <b>구글 드라이브</b>로 자동 전송됩니다.'
+    : (FORM.submitUrl&&/^https:\/\//.test(FORM.submitUrl))
+      ? '담당 선생님이 만든 <b>구글 폼</b>에 직접 올려 제출합니다.'
+      : '제출 파일이 내 기기에 저장되며, 내가 직접 담당 선생님께 전달합니다.';
+  const teacher=FORM.teacher?eh(FORM.teacher):'담당 교사';
+  return `<div class="privacy-box">
+    <h4>제출 시 아래 정보가 담당 선생님께 전달됩니다</h4>
+    <dl>
+      <dt>수집 항목</dt><dd>${eh(items)} / 과제 답안(글·사진·링크)</dd>
+      <dt>이용 목적</dt><dd>과제 제출 확인, 채점 및 피드백 제공</dd>
+      <dt>제공 받는 사람</dt><dd>${teacher}${FORM.subject?' ('+eh(FORM.subject)+')':''}</dd>
+      <dt>전달 방식</dt><dd>${dest}</dd>
+      <dt>보관 및 파기</dt><dd>학교의 학생 평가자료 관리 규정에 따라 보관·파기됩니다.</dd>
+    </dl>
+    <div class="privacy-note">· 이 도구는 별도의 외부 서버에 답안을 저장하지 않으며, 작성 내용은 내 기기(브라우저)에서 처리됩니다.<br>
+    · 동의를 거부할 수 있으나, 동의하지 않으면 과제를 제출할 수 없습니다. 이 경우 선생님께 직접 문의하세요.<br>
+    · 주민등록번호 등 과제와 무관한 민감정보는 답안에 적지 마세요.</div>
+  </div>`;
+}
+let _pendingShare=null;
+function openConsent(share){
+  _pendingShare=share;
+  document.getElementById('consentBody').innerHTML=privacyNoticeHtml();
+  document.getElementById('consentChk').checked=false;
+  document.getElementById('consentGo').disabled=true;
+  document.getElementById('consentOverlay').classList.add('show');
+}
+function closeConsent(){
+  document.getElementById('consentOverlay').classList.remove('show');
+  _pendingShare=null;
+}
+function agreeAndSubmit(){
+  if(!document.getElementById('consentChk').checked) return;
+  const share=_pendingShare;
+  DATA.consent={agreed:true,at:new Date().toISOString()};
+  document.getElementById('consentOverlay').classList.remove('show');
+  _pendingShare=null;
+  doSubmit(share);
+}
+
 async function submitHtml(share){
   if(!validateInfo()) return;
   const missing=FORM.tasks.filter(t=>{
@@ -570,6 +644,10 @@ async function submitHtml(share){
     return !((a.text&&a.text.trim())||(a.images&&a.images.length)||(a.links&&a.links.some(l=>l.url&&l.url.trim())));
   });
   if(share && missing.length && !confirm(`아직 작성하지 않은 항목이 ${missing.length}개 있습니다.\n그래도 제출할까요?`)) return;
+  openConsent(share);   // 동의를 받은 뒤 doSubmit으로 이어진다
+}
+
+async function doSubmit(share){
   const html=buildSubmissionHtml();
   const fname=wfname()+".과제제출.html";
   const blob=new Blob([html],{type:"text/html"});
@@ -650,7 +728,7 @@ function buildSubmissionHtml(){
     +'</style></head><body><div class="doc">'
     +`<header><div class="subj">${eh(FORM.subject||'실습과제')}</div><h1>${title}</h1><div class="info">${info}</div><div class="date">제출일시: ${ds}${FORM.teacher?'   ·   담당: '+eh(FORM.teacher):''}</div></header>`
     +blocks
-    +'<div class="badge">이 파일에는 채점용 제출 데이터가 함께 담겨 있습니다.<br>선생님 채점 도구에서 이 파일을 열면 자동으로 인식됩니다.</div>'
+    +'<div class="badge">이 파일에는 채점용 제출 데이터가 함께 담겨 있습니다.<br>선생님 채점 도구에서 이 파일을 열면 자동으로 인식됩니다.'+(DATA.consent&&DATA.consent.agreed?'<br>개인정보 수집·제공 동의 완료 ('+eh(new Date(DATA.consent.at).toLocaleString('ko-KR'))+')':'')+'</div>'
     +'</div>'
     +`<script type="application/json" id="__submission_data__">${embed}<\/script>`
     +'</body></html>';
