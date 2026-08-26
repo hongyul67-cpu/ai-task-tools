@@ -109,11 +109,20 @@ textarea{min-height:60px;}
     <div style="font-size:11.5px;color:#aab;margin-top:4px;">넣어두면 학생이 제출할 때 이 구글 폼이 자동으로 열려, 제출 파일을 폼에 올리도록 안내됩니다.
       <a href="구글폼_가이드.html" target="_blank" rel="noopener" style="color:var(--brand-d);font-weight:700;">→ 구글 폼 만드는 방법 보기</a></div>
   </div>
-  <div class="field" style="margin-bottom:0;">
+  <div class="field">
     <label class="fl">자동 업로드 주소 (Apps Script, 선택)</label>
     <input type="text" id="f_uploadurl" placeholder="예: https://script.google.com/macros/s/…/exec">
     <div style="font-size:11.5px;color:#aab;margin-top:4px;">넣어두면 학생이 <b>제출 버튼만 누르면</b> 선생님 드라이브로 파일이 자동 업로드됩니다(가장 편한 방식). 실패하면 자동으로 파일 저장 방식으로 전환됩니다.
       <a href="자동업로드_가이드.html" target="_blank" rel="noopener" style="color:var(--brand-d);font-weight:700;">→ 자동 업로드 설정 방법 보기 (10분)</a></div>
+  </div>
+  <div class="field" style="margin-bottom:0;">
+    <label class="fl">개인정보 수집·제공 동의 문구 (선택)</label>
+    <textarea id="f_privacy" style="min-height:90px;" placeholder="비워두면 기본 동의 문구가 자동으로 표시됩니다. 학교 방침에 맞게 고쳐 쓰려면 아래 버튼을 눌러 기본 문구를 불러온 뒤 수정하세요."></textarea>
+    <div style="font-size:11.5px;color:#aab;margin-top:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <button type="button" class="btn btn-ghost sm" onclick="loadDefaultPrivacy()">기본 문구 불러오기</button>
+      <button type="button" class="btn btn-ghost sm" onclick="document.getElementById('f_privacy').value='';toast('기본 문구가 자동 표시됩니다.')">비우기</button>
+      <span>학생이 제출하기 직전에 이 문구를 보고 동의해야 제출됩니다.</span>
+    </div>
   </div>
 </div>
 
@@ -237,6 +246,7 @@ function loadExisting(ev){
       document.getElementById('f_desc').value=j.description||'';
       document.getElementById('f_submiturl').value=j.submitUrl||'';
       document.getElementById('f_uploadurl').value=j.uploadUrl||'';
+      document.getElementById('f_privacy').value=j.privacyNotice||'';
       // 제출자 필드
       const sf=j.studentFields||[];
       document.getElementById('sf_class').checked=sf.some(f=>f.key==='className');
@@ -336,9 +346,32 @@ function buildJson(){
     description:document.getElementById('f_desc').value.trim(),
     submitUrl:document.getElementById('f_submiturl').value.trim(),
     uploadUrl:document.getElementById('f_uploadurl').value.trim(),
+    privacyNotice:document.getElementById('f_privacy').value.trim(),
     studentFields:sf,
     tasks:questions.map((q,i)=>({id:"q"+(i+1),title:q.title.trim()||`${i+1}. 질문`,guide:q.guide.trim(),allowText:!!q.allowText,allowImage:!!q.allowImage,allowLink:!!q.allowLink}))
   };
+}
+
+function loadDefaultPrivacy(){
+  const subj=document.getElementById('f_subject').value.trim();
+  const teacher=document.getElementById('f_teacher').value.trim()||'담당 교사';
+  const sf=[];
+  if(document.getElementById('sf_class').checked) sf.push('학반');
+  if(document.getElementById('sf_dept').checked) sf.push('학과');
+  if(document.getElementById('sf_id').checked) sf.push('학번');
+  sf.unshift('이름');
+  document.getElementById('f_privacy').value=
+`[개인정보 수집·제공 동의]
+
+· 수집 항목: ${sf.join(', ')} / 과제 답안(글·사진·링크)
+· 이용 목적: 과제 제출 확인, 채점 및 피드백 제공
+· 제공 받는 사람: ${teacher}${subj?' ('+subj+')':''}
+· 보관 및 파기: 학교의 학생 평가자료 관리 규정에 따라 보관·파기됩니다.
+
+※ 이 도구는 외부 서버에 답안을 저장하지 않으며, 작성 내용은 학생 기기에서 처리됩니다.
+※ 동의를 거부할 수 있으나, 동의하지 않으면 과제를 제출할 수 없습니다. 이 경우 선생님께 직접 문의하세요.
+※ 주민등록번호 등 과제와 무관한 민감정보는 답안에 적지 마세요.`;
+  toast('기본 문구를 불러왔습니다. 자유롭게 수정하세요.');
 }
 
 function validate(){

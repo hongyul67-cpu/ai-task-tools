@@ -595,6 +595,10 @@ async function makePdf(){
    제출은 이름·학번과 답안이 담긴 파일을 선생님께 보내는 행위이므로,
    실제 전송 전에 무엇이 어디로 가는지 알리고 동의를 받는다. */
 function privacyNoticeHtml(){
+  // 선생님이 양식에 직접 적은 동의 문구가 있으면 그것을 그대로 사용한다
+  if(FORM.privacyNotice&&FORM.privacyNotice.trim()){
+    return '<div class="privacy-box">'+eh(FORM.privacyNotice).replace(/\n/g,'<br>')+'</div>';
+  }
   const items=normalizeStudentFields().map(f=>f.label||f.key).join(', ');
   const dest = (FORM.uploadUrl&&/^https:\/\/script\.google\.com\//.test(FORM.uploadUrl))
       ? '담당 선생님의 <b>구글 드라이브</b>로 자동 전송됩니다.'
