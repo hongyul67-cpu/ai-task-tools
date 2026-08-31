@@ -288,7 +288,7 @@ function loadSub(ev){
       const j=extractSubmission(r.result);
       if(!j) throw "과제제출 파일이 아니거나 손상되었습니다. 학생이 '제출(공유)'로 보낸 .html(또는 .json) 파일을 열어주세요.";
       if(!j.__submission&&!j.__grading){
-        if(j.__work) throw "이 파일은 학생의 '작업중'(미제출) 파일입니다. 학생이 '제출(공유)'로 보낸 '과제제출.json' 파일을 받아서 열어주세요.";
+        if(j.__work) throw "이 파일은 학생의 '작업중'(미제출) 파일입니다. 학생이 '제출(공유)'로 보낸 '과제제출.html' 파일을 받아서 열어주세요.";
         if(j.__autosave) throw "이 파일은 학생 브라우저의 자동저장 파일입니다. 제출용 파일이 아닙니다.";
         if(j.tasks) throw "이 파일은 '과제 양식' 파일입니다. 학생 제출 파일이 아닙니다.";
         throw "과제제출 파일이 아니거나 손상되었습니다. (파일 이름이 아니라 내용으로 판별하니 이름은 자유롭게 바꿔도 됩니다)";
